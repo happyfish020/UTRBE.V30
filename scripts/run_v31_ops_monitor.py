@@ -419,6 +419,8 @@ def main() -> None:
     p.add_argument("--v2-latest-state-json", default="")
     p.add_argument("--unified-sentiment-json", default="")
     p.add_argument("--unified-sentiment-summary-json", default="")
+    p.add_argument("--policy-name", default="")
+    p.add_argument("--policy-config-json", default="")
     p.add_argument("--snapshot-table", default="v31_ops_monitor_snapshot")
     p.add_argument("--health-table", default="v31_ops_monitor_health_checks")
     p.add_argument("--episodes-table", default="v31_ops_monitor_episodes")
@@ -434,6 +436,31 @@ def main() -> None:
     v2 = _load_json_optional(args.v2_latest_state_json)
     us = _load_json_optional(args.unified_sentiment_json)
     us_sum = _load_json_optional(args.unified_sentiment_summary_json)
+    alloc_cfg = rk.get("config", {}).get("allocation", {}) if isinstance(rk, dict) else {}
+    agg_cfg = rk.get("config", {}).get("aggregation", {}) if isinstance(rk, dict) else {}
+    policy_name = str(args.policy_name).strip() or "NA"
+    policy_cfg = str(args.policy_config_json).strip() or "NA"
+    policy_cfg_json = _load_json_optional(policy_cfg)
+    if not alloc_cfg and isinstance(policy_cfg_json, dict):
+        alloc_cfg = policy_cfg_json
+    if not agg_cfg and isinstance(policy_cfg_json, dict):
+        agg_cfg = policy_cfg_json
+    def _cfg_pick(k: str, primary: dict, secondary: dict, default):
+        if isinstance(primary, dict) and k in primary and primary.get(k) not in (None, ""):
+            return primary.get(k)
+        if isinstance(secondary, dict) and k in secondary and secondary.get(k) not in (None, ""):
+            return secondary.get(k)
+        return default
+    policy_snapshot = {
+        "name": policy_name,
+        "config_json": policy_cfg,
+        "tactical_gate_mode": str(_cfg_pick("tactical_gate_mode", alloc_cfg, policy_cfg_json, "NA")),
+        "early_struct_gate_mode": str(_cfg_pick("early_struct_gate_mode", alloc_cfg, policy_cfg_json, "NA")),
+        "early_struct_top20_mult": float(pd.to_numeric(_cfg_pick("early_struct_top20_mult", alloc_cfg, policy_cfg_json, 1.0), errors="coerce")),
+        "early_struct_top10_mult": float(pd.to_numeric(_cfg_pick("early_struct_top10_mult", alloc_cfg, policy_cfg_json, 1.0), errors="coerce")),
+        "shock_risk_cut": float(pd.to_numeric(_cfg_pick("shock_risk_cut", agg_cfg, policy_cfg_json, 0.0), errors="coerce")),
+        "shock_high_cut": float(pd.to_numeric(_cfg_pick("shock_high_cut", agg_cfg, policy_cfg_json, 0.0), errors="coerce")),
+    }
 
     if str(args.allocation_table).strip():
         alloc = _read_table(engine, str(args.allocation_table).strip(), start=str(args.start_date), end=str(args.end_date))
@@ -472,17 +499,27 @@ def main() -> None:
     }
 
     alloc_sorted = alloc.sort_values("date").reset_index(drop=True).copy()
+    def _col_series(name: str, default: float = 0.0) -> pd.Series:
+        if name in alloc_sorted.columns:
+            return pd.to_numeric(alloc_sorted[name], errors="coerce")
+        return pd.Series([default] * len(alloc_sorted), index=alloc_sorted.index, dtype=float)
+
     latest_row = alloc_sorted.iloc[-1].to_dict()
     trade_date = str(pd.to_datetime(latest_row["date"]).date())
     date_tag = trade_date.replace("-", "")
 
     p_struct = float(pd.to_numeric(latest_row.get("p_structural", 0.0), errors="coerce"))
     p_shock = float(pd.to_numeric(latest_row.get("p_shock", 0.0), errors="coerce"))
-    p_struct_20 = float(pd.to_numeric(alloc_sorted.get("p_structural", 0.0), errors="coerce").tail(20).mean())
-    p_shock_20 = float(pd.to_numeric(alloc_sorted.get("p_shock", 0.0), errors="coerce").tail(20).mean())
+    early_score = float(pd.to_numeric(latest_row.get("early_score", 0.0), errors="coerce"))
+    early_level = int(pd.to_numeric(latest_row.get("early_struct_level", 0), errors="coerce"))
+    early_mult = float(pd.to_numeric(latest_row.get("early_struct_multiplier", 1.0), errors="coerce"))
+    p_struct_20 = float(_col_series("p_structural").tail(20).mean())
+    p_shock_20 = float(_col_series("p_shock").tail(20).mean())
+    early_score_20 = float(_col_series("early_score").tail(20).mean())
 
     out = {
         "window": bt.get("window", {}),
+        "policy": policy_snapshot,
         "latest_market_snapshot": {
             "trade_date": trade_date,
             "final_allocation": float(pd.to_numeric(latest_row.get("final_allocation", 0.0), errors="coerce")),
@@ -493,6 +530,10 @@ def main() -> None:
             "p_shock_today": p_shock,
             "p_structural_20d_avg": p_struct_20,
             "p_shock_20d_avg": p_shock_20,
+            "early_score_today": early_score,
+            "early_struct_level_today": early_level,
+            "early_struct_multiplier_today": early_mult,
+            "early_score_20d_avg": early_score_20,
         },
         "metrics": {
             "cagr_impact": cagr_impact,
@@ -601,7 +642,8 @@ def main() -> None:
 
     p_struct_lvl = "低" if p_struct < 0.25 else ("中" if p_struct < 0.55 else "高")
     p_shock_lvl = "低" if p_shock < 0.25 else ("中" if p_shock < 0.55 else "高")
-    comp20 = float(pd.to_numeric(alloc_sorted.get("composite_risk_score", 0.0), errors="coerce").tail(20).mean())
+    early_lvl_text = {0: "常态", 1: "Top20%预警", 2: "Top10%预警"}.get(early_level, str(early_level))
+    comp20 = float(_col_series("composite_risk_score").tail(20).mean())
     comp_lvl = "低" if comp20 < 0.35 else ("中" if comp20 < 0.60 else "高")
 
     prev_action = str(alloc_sorted.iloc[-2]["allocation_action"]) if len(alloc_sorted) >= 2 else latest_action
@@ -614,6 +656,34 @@ def main() -> None:
     gate10 = "->".join(last10.get("hard_gate_reason", pd.Series(["NONE"] * len(last10))).astype(str).tolist())
     action10 = "->".join(last10.get("allocation_action", pd.Series(["NA"] * len(last10))).astype(str).tolist())
     alloc10 = "->".join([f"{float(pd.to_numeric(v, errors='coerce')):.2f}" for v in last10.get("final_allocation", pd.Series([0.0] * len(last10))).tolist()])
+
+    tactical_gate_mode = str(policy_snapshot.get("tactical_gate_mode", "NA")).upper()
+    early_gate_mode = str(policy_snapshot.get("early_struct_gate_mode", "NA")).upper()
+    gate_trend_text = "无法判定（缺少价格数据）"
+    if "market_price" in alloc_sorted.columns:
+        px_s = pd.to_numeric(alloc_sorted["market_price"], errors="coerce")
+        px_now = float(px_s.iloc[-1]) if len(px_s) else float("nan")
+        if tactical_gate_mode == "MA100" or early_gate_mode == "MA100":
+            ma100 = px_s.rolling(100, min_periods=100).mean()
+            ma100_now = float(ma100.iloc[-1]) if len(ma100) else float("nan")
+            if pd.notna(px_now) and pd.notna(ma100_now):
+                gate_trend_text = "当前价格在 MA100 之上" if px_now >= ma100_now else "当前价格在 MA100 之下"
+        elif tactical_gate_mode == "MA200" or early_gate_mode == "MA200":
+            ma200 = px_s.rolling(200, min_periods=200).mean()
+            ma200_now = float(ma200.iloc[-1]) if len(ma200) else float("nan")
+            if pd.notna(px_now) and pd.notna(ma200_now):
+                gate_trend_text = "当前价格在 MA200 之上" if px_now >= ma200_now else "当前价格在 MA200 之下"
+
+    overall_safe = (comp20 < 0.35) and (str(effective_regime).upper() in {"LOW", "MEDIUM_GATED"}) and (latest_alloc >= 0.95)
+    struct_near_zero = (p_struct <= 0.05 and p_struct_20 <= 0.08)
+    shock_near_zero = (p_shock <= 0.08 and p_shock_20 <= 0.10)
+    early_top15_mult = float(policy_snapshot.get("early_struct_top20_mult", 0.90))
+    early_top5_mult = float(policy_snapshot.get("early_struct_top10_mult", 0.80))
+    early_inactive = (early_level == 0 and abs(float(early_mult) - 1.0) < 1e-9)
+    hardgate_none = str(latest_reason).upper() == "NONE"
+    tactical_level_now = int(pd.to_numeric(latest_row.get("tactical_level", 0), errors="coerce"))
+    tactical_mult_now = float(pd.to_numeric(latest_row.get("tactical_multiplier", 1.0), errors="coerce"))
+    tactical_gate_on_now = bool(int(pd.to_numeric(latest_row.get("tactical_gate_on", 0), errors="coerce")) == 1)
 
     data_start = str(pd.to_datetime(alloc_sorted["date"].iloc[0]).date())
     data_end = str(pd.to_datetime(alloc_sorted["date"].iloc[-1]).date())
@@ -668,6 +738,10 @@ def main() -> None:
         "# 每日风险报告（易读版）",
         "",
         f"## 今日结论（{trade_date}）",
+        f"- 冻结策略：{policy_name}",
+        f"- 策略配置文件：{policy_cfg}",
+        f"- 策略门控：tactical={policy_snapshot['tactical_gate_mode']} | early={policy_snapshot['early_struct_gate_mode']}",
+        f"- Early 乘数：Top15%={policy_snapshot['early_struct_top20_mult']:.2f} | Top5%={policy_snapshot['early_struct_top10_mult']:.2f}",
         f"- 当前状态：{_cn_regime(effective_regime)}{effective_regime_note}",
         f"- 操作建议：{_cn_action(latest_action)}",
         f"- 执行信号：{execution_signal}",
@@ -686,6 +760,7 @@ def main() -> None:
     explain_lines = [
         f"- 结构轨当前为{p_struct_lvl}压，主要看市场底层是否在变坏。",
         f"- 冲击轨当前为{p_shock_lvl}压，主要看短期是否有突发下跌风险。",
+        f"- Early-Structural 当前为{early_lvl_text}，对应乘数 {early_mult:.2f}，用于顶部失稳期的轻度提前降仓。",
     ]
     if guardrail_applied and latest_alloc < 0.95:
         explain_lines.append("- 执行层已触发护栏：尽管模型原始双轨仍偏低压，出于跨层预警与数据新鲜度约束，仓位按防守口径下调。")
@@ -695,10 +770,54 @@ def main() -> None:
         "## 核心指标",
         f"- 结构轨风险概率（今天 / 近20日）：{p_struct:.3f} / {p_struct_20:.3f}",
         f"- 冲击轨风险概率（今天 / 近20日）：{p_shock:.3f} / {p_shock_20:.3f}",
+        f"- Early-Structural（今天 / 近20日）：{early_score:.3f} / {early_score_20:.3f} | 级别={early_lvl_text} | 乘数={early_mult:.2f}",
         f"- 组合风险（近20日均值）：{comp20:.3f}（{comp_lvl}）",
         f"- 今日最终仓位：{latest_alloc:.3f}",
         f"- 回撤压缩（目标>=40%）：{dd_reduction:.6f}",
         f"- 收益影响（目标<2%）：{cagr_impact:.6f}",
+        "",
+        "## 解释版（更易懂）",
+        "### 一、今天整体安全吗？",
+        f"- 看三件事：组合风险（近20日）={comp20:.3f}；当前状态={_cn_regime(effective_regime)}；今日最终仓位={latest_alloc:.3f}。",
+        ("- 意思是：系统判断当前没有系统性风险，所以保持满仓进攻。"
+         if overall_safe else "- 意思是：系统未处于“完全安全”状态，仓位会按规则进入防守或过渡。"),
+        ("- 这是模型和门控共同给出的结果，不是主观判断；当前没有明显风险门控触发。"
+         if hardgate_none and early_inactive else "- 当前仍有部分门控在生效（硬门槛或 Early/Tactical 层）。"),
+        "",
+        "### 二、结构轨 & 冲击轨在干嘛？",
+        f"- 结构轨风险概率：今天 {p_struct:.3f}；近20日 {p_struct_20:.3f}。"
+        + (" 接近 0，说明没有慢性熊市结构风险。" if struct_near_zero else " 处于可关注区间，需继续观察趋势和中期环境。"),
+        ("- 说明：没有慢性熊市结构风险。"
+         if struct_near_zero else "- 说明：中期结构风险仍需持续观察。"),
+        "- 结构轨升高通常意味着：趋势走坏、中期环境恶化。",
+        f"- 冲击轨风险概率：今天 {p_shock:.3f}；近20日 {p_shock_20:.3f}。"
+        + (" 当前较低，短期崩盘压力不强。" if shock_near_zero else " 不算低位，需关注突发波动风险。"),
+        ("- 说明：没有短期崩盘压力。"
+         if shock_near_zero else "- 说明：短期冲击压力仍需跟踪。"),
+        "- 冲击轨一般会在突发下跌前抬升。",
+        "",
+        "### 三、Early-Structural 是什么？",
+        f"- 今天 {early_score:.3f}；近20日 {early_score_20:.3f}；级别 {early_lvl_text}；乘数 {early_mult:.2f}。",
+        "- 意思是：风险分位处在中等区域。",
+        ("- 没有进入 Top15%。" if early_level < 1 else "- 已进入 Top15%。"),
+        ("- 没有进入 Top5%。" if early_level < 2 else "- 已进入 Top5%。"),
+        ("- 当前未进入 Top15% / Top5%，所以没有触发 Early 降仓。"
+         if early_inactive else "- 当前已进入 Early 风险分位区间，Early 层正在抑制仓位。"),
+        ("- 所以：没触发 Early 降仓。"
+         if early_inactive else "- 所以：已触发 Early 降仓。"),
+        f"- 规则：进入 Top15% 时仓位乘以 {early_top15_mult:.2f}；进入 Top5% 时仓位乘以 {early_top5_mult:.2f}。",
+        "",
+        "### 四、为什么仓位是 1.000（或接近）？",
+        f"- 当前门控：Tactical={tactical_gate_mode}；Early={early_gate_mode}。",
+        f"- 趋势条件：{gate_trend_text}。",
+        ("- 在 MA 门控规则下，趋势未破位时通常不减仓。"
+         if "MA" in tactical_gate_mode or "MA" in early_gate_mode else "- 当前门控不使用 MA 趋势条件，仓位由风险分层直接决定。"),
+        "",
+        "### 五、Tactical 是什么？",
+        "- Tactical 是短周期风控层，用来在短期波动放大时做临时降仓，避免净值大幅回撤。",
+        f"- 今日 Tactical 状态：level={tactical_level_now}，multiplier={tactical_mult_now:.2f}，gate_on={tactical_gate_on_now}。",
+        (f"- 当前 Tactical 门控为 {tactical_gate_mode}，且门控未打开，所以 Tactical 对仓位不生效。"
+         if (not tactical_gate_on_now) else f"- 当前 Tactical 门控为 {tactical_gate_mode}，门控已打开，Tactical 正在参与仓位调整。"),
         "",
         "## 人话解释（怎么读这些数字）",
         *explain_lines,
@@ -764,6 +883,9 @@ def main() -> None:
                     "final_allocation": latest_alloc,
                     "p_structural_today": p_struct,
                     "p_shock_today": p_shock,
+                    "early_score_today": early_score,
+                    "early_struct_level_today": early_level,
+                    "early_struct_multiplier_today": early_mult,
                     "p_structural_20d_avg": p_struct_20,
                     "p_shock_20d_avg": p_shock_20,
                     "cagr_impact": cagr_impact,

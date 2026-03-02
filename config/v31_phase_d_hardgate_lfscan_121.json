@@ -43,5 +43,18 @@
     "hard_crisis_allocation":  0.3,
     "hard_credit_q":  0.95,
     "hard_credit_window":  252,
-    "hard_force_sets_regime_crisis":  false
+    "hard_force_sets_regime_crisis":  false,
+    "early_struct_enable":  true,
+    "early_struct_z_window":  252,
+    "early_struct_z_min_periods":  60,
+    "early_struct_ma_window":  20,
+    "early_struct_slope_lag":  5,
+    "early_struct_w_vol":  0.5,
+    "early_struct_w_mom":  0.3,
+    "early_struct_w_slope":  0.2,
+    "early_struct_q20":  0.85,
+    "early_struct_q10":  0.95,
+    "early_struct_top20_mult":  0.9,
+    "early_struct_top10_mult":  0.8,
+    "early_struct_gate_mode":  "MA100"
 }

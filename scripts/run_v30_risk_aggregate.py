@@ -207,6 +207,16 @@ def _build_agg_cfg(tuning: dict) -> AggregationConfig:
         hard_credit_window=int(tuning.get('hard_credit_window', AggregationConfig.hard_credit_window)),
         hard_force_sets_regime_crisis=bool(tuning.get('hard_force_sets_regime_crisis', AggregationConfig.hard_force_sets_regime_crisis)),
         ibb_risk_weight=float(tuning.get('ibb_risk_weight', AggregationConfig.ibb_risk_weight)),
+        early_struct_enable=bool(tuning.get('early_struct_enable', AggregationConfig.early_struct_enable)),
+        early_struct_z_window=int(tuning.get('early_struct_z_window', AggregationConfig.early_struct_z_window)),
+        early_struct_z_min_periods=int(tuning.get('early_struct_z_min_periods', AggregationConfig.early_struct_z_min_periods)),
+        early_struct_ma_window=int(tuning.get('early_struct_ma_window', AggregationConfig.early_struct_ma_window)),
+        early_struct_slope_lag=int(tuning.get('early_struct_slope_lag', AggregationConfig.early_struct_slope_lag)),
+        early_struct_w_vol=float(tuning.get('early_struct_w_vol', AggregationConfig.early_struct_w_vol)),
+        early_struct_w_mom=float(tuning.get('early_struct_w_mom', AggregationConfig.early_struct_w_mom)),
+        early_struct_w_slope=float(tuning.get('early_struct_w_slope', AggregationConfig.early_struct_w_slope)),
+        early_struct_q20=float(tuning.get('early_struct_q20', AggregationConfig.early_struct_q20)),
+        early_struct_q10=float(tuning.get('early_struct_q10', AggregationConfig.early_struct_q10)),
     )
 
 
@@ -226,6 +236,7 @@ def _build_alloc_cfg(tuning: dict) -> AllocationConfig:
         shock_high_cut=float(tuning.get('alloc_shock_high_cut', AllocationConfig.shock_high_cut)),
         shock_risk_cut=float(tuning.get('alloc_shock_risk_cut', AllocationConfig.shock_risk_cut)),
         tactical_multipliers=tactical_multipliers,
+        tactical_gate_mode=str(tuning.get('tactical_gate_mode', AllocationConfig.tactical_gate_mode)),
         v31_step_mode=bool(tuning.get('v31_step_mode', AllocationConfig.v31_step_mode)),
         step_alloc_low=float(tuning.get('step_alloc_low', AllocationConfig.step_alloc_low)),
         step_alloc_medium=float(tuning.get('step_alloc_medium', AllocationConfig.step_alloc_medium)),
@@ -247,6 +258,10 @@ def _build_alloc_cfg(tuning: dict) -> AllocationConfig:
         recovery_boost_start_floor=float(tuning.get('recovery_boost_start_floor', AllocationConfig.recovery_boost_start_floor)),
         recovery_boost_step=float(tuning.get('recovery_boost_step', AllocationConfig.recovery_boost_step)),
         recovery_boost_max=float(tuning.get('recovery_boost_max', AllocationConfig.recovery_boost_max)),
+        early_struct_enable=bool(tuning.get('early_struct_enable', AllocationConfig.early_struct_enable)),
+        early_struct_top20_mult=float(tuning.get('early_struct_top20_mult', AllocationConfig.early_struct_top20_mult)),
+        early_struct_top10_mult=float(tuning.get('early_struct_top10_mult', AllocationConfig.early_struct_top10_mult)),
+        early_struct_gate_mode=str(tuning.get('early_struct_gate_mode', AllocationConfig.early_struct_gate_mode)),
     )
 
 
@@ -341,6 +356,11 @@ def main() -> None:
         'date',
         'p_structural',
         'p_shock',
+        'early_score_raw',
+        'early_score',
+        'early_score_q20_thr',
+        'early_score_q10_thr',
+        'early_struct_level',
         'tactical_level',
         'risk_regime',
         'structural_damage_score',
@@ -368,6 +388,8 @@ def main() -> None:
         'base_allocation',
         'shock_modifier',
         'tactical_multiplier',
+        'tactical_gate_on',
+        'early_struct_multiplier',
         'final_allocation',
         'allocation_action',
         'guardrail_applied',
@@ -383,7 +405,7 @@ def main() -> None:
     if not bool(args.skip_csv_output):
         out.to_csv(out_dir / 'daily_allocation.csv', index=False)
     if not bool(args.skip_db_upsert):
-        int_cols = {"tactical_level", "hard_force_crisis", "hard_trend_cap_flag", "hard_credit_high_flag", "recovery_active", "recovery_days", "guardrail_applied"}
+        int_cols = {"early_struct_level", "tactical_level", "tactical_gate_on", "hard_force_crisis", "hard_trend_cap_flag", "hard_credit_high_flag", "recovery_active", "recovery_days", "guardrail_applied"}
         rows = _upsert_df(out, table_name=str(args.output_table), int_cols=int_cols)
         print(f"[OK] DB upsert rows: {rows} -> table `{args.output_table}`")
 
@@ -399,6 +421,8 @@ def main() -> None:
         'regime_counts': out['risk_regime'].value_counts().to_dict(),
         'action_counts': out['allocation_action'].value_counts().to_dict(),
         'hard_gate_counts': out['hard_gate_reason'].value_counts().to_dict() if 'hard_gate_reason' in out.columns else {},
+        'early_struct_level_counts': out['early_struct_level'].value_counts().to_dict() if 'early_struct_level' in out.columns else {},
+        'avg_early_score': float(pd.to_numeric(out.get('early_score', 0.0), errors='coerce').mean()) if 'early_score' in out.columns else 0.0,
         'guardrail_applied_count': int(pd.to_numeric(out.get('guardrail_applied', 0), errors='coerce').fillna(0).sum()) if 'guardrail_applied' in out.columns else 0,
         'guardrail_reasons_latest': str(out.iloc[0].get('guardrail_reasons', '')) if 'guardrail_reasons' in out.columns and len(out) > 0 else '',
     }
@@ -429,6 +453,16 @@ def main() -> None:
             'hard_credit_q': float(agg_cfg.hard_credit_q),
             'hard_credit_window': int(agg_cfg.hard_credit_window),
             'hard_force_sets_regime_crisis': bool(agg_cfg.hard_force_sets_regime_crisis),
+            'early_struct_enable': bool(agg_cfg.early_struct_enable),
+            'early_struct_z_window': int(agg_cfg.early_struct_z_window),
+            'early_struct_z_min_periods': int(agg_cfg.early_struct_z_min_periods),
+            'early_struct_ma_window': int(agg_cfg.early_struct_ma_window),
+            'early_struct_slope_lag': int(agg_cfg.early_struct_slope_lag),
+            'early_struct_w_vol': float(agg_cfg.early_struct_w_vol),
+            'early_struct_w_mom': float(agg_cfg.early_struct_w_mom),
+            'early_struct_w_slope': float(agg_cfg.early_struct_w_slope),
+            'early_struct_q20': float(agg_cfg.early_struct_q20),
+            'early_struct_q10': float(agg_cfg.early_struct_q10),
         },
         'allocation': {
             'base_bins': list(alloc_cfg.base_bins),
@@ -436,6 +470,7 @@ def main() -> None:
             'shock_high_cut': float(alloc_cfg.shock_high_cut),
             'shock_risk_cut': float(alloc_cfg.shock_risk_cut),
             'tactical_multipliers': list(alloc_cfg.tactical_multipliers),
+            'tactical_gate_mode': str(alloc_cfg.tactical_gate_mode),
             'v31_step_mode': bool(alloc_cfg.v31_step_mode),
             'step_alloc_low': float(alloc_cfg.step_alloc_low),
             'step_alloc_medium': float(alloc_cfg.step_alloc_medium),
@@ -457,6 +492,10 @@ def main() -> None:
             'recovery_boost_start_floor': float(alloc_cfg.recovery_boost_start_floor),
             'recovery_boost_step': float(alloc_cfg.recovery_boost_step),
             'recovery_boost_max': float(alloc_cfg.recovery_boost_max),
+            'early_struct_enable': bool(alloc_cfg.early_struct_enable),
+            'early_struct_top20_mult': float(alloc_cfg.early_struct_top20_mult),
+            'early_struct_top10_mult': float(alloc_cfg.early_struct_top10_mult),
+            'early_struct_gate_mode': str(alloc_cfg.early_struct_gate_mode),
         },
         'live_guardrail': {
             'cap_lowfreq_alert': float(cap_lowfreq_alert),
@@ -473,7 +512,10 @@ def main() -> None:
         f"- date: {latest['date']}",
         f"- p_structural: {float(latest.get('p_structural', 0.0)):.4f}",
         f"- p_shock: {float(latest.get('p_shock', 0.0)):.4f}",
+        f"- early_score: {float(latest.get('early_score', 0.0)):.4f}",
+        f"- early_struct_level: {int(pd.to_numeric(latest.get('early_struct_level', 0), errors='coerce'))}",
         f"- tactical_level: {int(latest.get('tactical_level', 0))}",
+        f"- tactical_gate_on: {int(pd.to_numeric(latest.get('tactical_gate_on', 0), errors='coerce'))}",
         f"- risk_regime: {latest.get('risk_regime', 'NA')}",
         f"- final_allocation: {float(latest.get('final_allocation', 0.0)):.2f}",
         f"- allocation_action: {latest.get('allocation_action', 'NA')}",

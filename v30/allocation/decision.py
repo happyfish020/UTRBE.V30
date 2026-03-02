@@ -11,6 +11,7 @@ class AllocationConfig:
     shock_high_cut: float = 0.85
     shock_risk_cut: float = 0.70
     tactical_multipliers: tuple = (1.00, 0.90, 0.80, 0.70)
+    tactical_gate_mode: str = "NONE"
     v31_step_mode: bool = False
     step_alloc_low: float = 1.00
     step_alloc_medium: float = 0.85
@@ -32,6 +33,10 @@ class AllocationConfig:
     recovery_boost_start_floor: float = 0.60
     recovery_boost_step: float = 0.12
     recovery_boost_max: float = 0.95
+    early_struct_enable: bool = True
+    early_struct_top20_mult: float = 0.90
+    early_struct_top10_mult: float = 0.80
+    early_struct_gate_mode: str = "NONE"
 
 
 def base_allocation(p_struct: float, cfg: AllocationConfig) -> float:
@@ -58,12 +63,38 @@ def apply_allocation(df: pd.DataFrame, cfg: AllocationConfig) -> pd.DataFrame:
     out_base = []
     out_shock_mod = []
     out_tac_mod = []
+    out_tac_gate = []
+    out_early_mod = []
     out_final = []
     actions = []
     out_recovery_active = []
     out_recovery_cap = []
     out_recovery_days = []
     out_recovery_floor = []
+
+    # Optional gate for tactical layer.
+    tac_gate_mode = str(cfg.tactical_gate_mode).strip().upper()
+    px = pd.to_numeric(x.get('market_price', pd.Series([pd.NA] * len(x))), errors='coerce')
+    ret20d = pd.to_numeric(x.get('ret20d', pd.Series([pd.NA] * len(x))), errors='coerce')
+    if tac_gate_mode == "MA100":
+        ma100 = px.rolling(100, min_periods=100).mean()
+        tactical_gate_on = (px < ma100).fillna(False)
+    elif tac_gate_mode in {"RET20D_NEG", "MOM20_NEG"}:
+        tactical_gate_on = (ret20d < 0.0).fillna(False)
+    else:
+        tactical_gate_on = pd.Series(True, index=x.index)
+
+    # Optional trend gate for Early-Structural multiplier (e.g., MA100 / MA200).
+    gate_mode = str(cfg.early_struct_gate_mode).strip().upper()
+    px = pd.to_numeric(x.get('market_price', pd.Series([pd.NA] * len(x))), errors='coerce')
+    if gate_mode == "MA100":
+        ma_gate = px.rolling(100, min_periods=100).mean()
+        early_gate_on = (px < ma_gate).fillna(False)
+    elif gate_mode == "MA200":
+        ma_gate = px.rolling(200, min_periods=200).mean()
+        early_gate_on = (px < ma_gate).fillna(False)
+    else:
+        early_gate_on = pd.Series(True, index=x.index)
 
     # Stateful recovery controller (date-ordered rows expected).
     recovery_active = False
@@ -116,8 +147,19 @@ def apply_allocation(df: pd.DataFrame, cfg: AllocationConfig) -> pd.DataFrame:
         else:
             shock_mod = 1.0
 
-        tac_mod = tactical_multiplier(tl, cfg)
-        final_alloc = max(0.0, min(1.0, base * shock_mod * tac_mod))
+        tac_mod = tactical_multiplier(tl, cfg) if bool(tactical_gate_on.iloc[i]) else 1.0
+        early_level = int(pd.to_numeric(r.get('early_struct_level', 0), errors='coerce'))
+        if bool(cfg.early_struct_enable) and bool(early_gate_on.iloc[i]):
+            if early_level >= 2:
+                early_mod = float(cfg.early_struct_top10_mult)
+            elif early_level >= 1:
+                early_mod = float(cfg.early_struct_top20_mult)
+            else:
+                early_mod = 1.0
+        else:
+            early_mod = 1.0
+
+        final_alloc = max(0.0, min(1.0, base * shock_mod * tac_mod * early_mod))
         if hard_force_crisis == 1:
             # Crisis hard-gate is controlled by hard_max_allocation (from aggregation layer).
             final_alloc = min(final_alloc, max(0.0, min(1.0, hard_cap)))
@@ -188,12 +230,16 @@ def apply_allocation(df: pd.DataFrame, cfg: AllocationConfig) -> pd.DataFrame:
         out_base.append(base)
         out_shock_mod.append(shock_mod)
         out_tac_mod.append(tac_mod)
+        out_tac_gate.append(int(bool(tactical_gate_on.iloc[i])))
+        out_early_mod.append(early_mod)
         out_final.append(final_alloc)
         actions.append(action)
 
     x['base_allocation'] = out_base
     x['shock_modifier'] = out_shock_mod
     x['tactical_multiplier'] = out_tac_mod
+    x['tactical_gate_on'] = out_tac_gate
+    x['early_struct_multiplier'] = out_early_mod
     x['final_allocation'] = out_final
     x['allocation_action'] = actions
     x['recovery_active'] = out_recovery_active

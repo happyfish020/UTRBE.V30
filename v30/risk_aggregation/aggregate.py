@@ -1,6 +1,7 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import dataclass
+import numpy as np
 import pandas as pd
 
 
@@ -31,6 +32,74 @@ class AggregationConfig:
     hard_credit_window: int = 252
     hard_force_sets_regime_crisis: bool = False
     ibb_risk_weight: float = 0.05
+    # Early-Structural layer
+    early_struct_enable: bool = True
+    early_struct_z_window: int = 252
+    early_struct_z_min_periods: int = 60
+    early_struct_ma_window: int = 20
+    early_struct_slope_lag: int = 5
+    early_struct_w_vol: float = 0.50
+    early_struct_w_mom: float = 0.30
+    early_struct_w_slope: float = 0.20
+    early_struct_q20: float = 0.80
+    early_struct_q10: float = 0.90
+
+
+def _rolling_z(s: pd.Series, window: int, min_periods: int) -> pd.Series:
+    mu = s.rolling(window, min_periods=min_periods).mean()
+    sd = s.rolling(window, min_periods=min_periods).std(ddof=0).replace(0.0, np.nan)
+    return (s - mu) / sd
+
+
+def _compute_early_structural_layer(df: pd.DataFrame, cfg: AggregationConfig) -> pd.DataFrame:
+    x = df.copy()
+    if not bool(cfg.early_struct_enable):
+        x['early_score_raw'] = 0.0
+        x['early_score'] = 0.5
+        x['early_score_q20_thr'] = np.nan
+        x['early_score_q10_thr'] = np.nan
+        x['early_struct_level'] = 0
+        return x
+
+    w = max(40, int(cfg.early_struct_z_window))
+    minp = max(20, min(int(cfg.early_struct_z_min_periods), w))
+    ma_w = max(5, int(cfg.early_struct_ma_window))
+    slope_lag = max(1, int(cfg.early_struct_slope_lag))
+
+    vol20 = pd.to_numeric(x.get('vol20', 0.0), errors='coerce').fillna(0.0)
+    ret5d = pd.to_numeric(x.get('ret5d', 0.0), errors='coerce').fillna(0.0)
+    px = pd.to_numeric(x.get('market_price', 0.0), errors='coerce').ffill().fillna(0.0)
+
+    z_vol20 = _rolling_z(vol20, w, minp)
+    z_mom = -_rolling_z(ret5d, w, minp)
+    ma20 = px.rolling(ma_w, min_periods=ma_w).mean()
+    ma20_slope = ma20 - ma20.shift(slope_lag)
+    z_slope = -_rolling_z(ma20_slope, w, minp)
+
+    raw = (
+        float(cfg.early_struct_w_vol) * z_vol20.fillna(0.0)
+        + float(cfg.early_struct_w_mom) * z_mom.fillna(0.0)
+        + float(cfg.early_struct_w_slope) * z_slope.fillna(0.0)
+    )
+    score = 1.0 / (1.0 + np.exp(-raw.clip(-12.0, 12.0)))
+
+    q20 = min(max(float(cfg.early_struct_q20), 0.50), 0.995)
+    q10 = min(max(float(cfg.early_struct_q10), q20), 0.999)
+    hist = score.shift(1)
+    q20_thr = hist.expanding(min_periods=minp).quantile(q20)
+    q10_thr = hist.expanding(min_periods=minp).quantile(q10)
+
+    lvl = pd.Series(0, index=x.index, dtype=int)
+    lvl[score >= q20_thr] = 1
+    lvl[score >= q10_thr] = 2
+    lvl = lvl.fillna(0).astype(int)
+
+    x['early_score_raw'] = raw.astype(float)
+    x['early_score'] = score.astype(float)
+    x['early_score_q20_thr'] = q20_thr.astype(float)
+    x['early_score_q10_thr'] = q10_thr.astype(float)
+    x['early_struct_level'] = lvl
+    return x
 
 
 def derive_tactical_level(df: pd.DataFrame) -> pd.Series:
@@ -99,6 +168,7 @@ def aggregate_risk(df: pd.DataFrame, cfg: AggregationConfig) -> pd.DataFrame:
     x = df.copy()
     x['p_structural'] = pd.to_numeric(x['p_structural'], errors='coerce').fillna(0.0)
     x['p_shock'] = pd.to_numeric(x['p_shock'], errors='coerce').fillna(0.0)
+    x = _compute_early_structural_layer(x, cfg)
     # Effective shock cuts can be dynamic (history-only rolling quantiles) or static.
     if bool(cfg.shock_dynamic_gate):
         w = max(20, int(cfg.shock_dynamic_window))

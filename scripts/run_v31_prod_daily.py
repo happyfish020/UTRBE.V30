@@ -131,7 +131,8 @@ def main() -> None:
     p.add_argument("--market-features-table", default="market_features_daily")
     p.add_argument("--skip-utrbe-refresh", action="store_true")
     p.add_argument("--breadth-csv", default="../UTRBE/output/full_2006_2026.csv")
-    p.add_argument("--tuning-json", default="config/v31_phase_d_default_prod_20260223.json")
+    p.add_argument("--tuning-json", default="config/v31_phase_d_A_ma100_frozen_20260302.json")
+    p.add_argument("--policy-name", default="A_ma100_frozen")
     p.add_argument("--retrain-models", action="store_true")
     p.add_argument("--shock-train-output-dir", default="output/v30_shock_train_step4")
     args = p.parse_args()
@@ -436,6 +437,10 @@ def main() -> None:
                     "output/v31_unified_sentiment/latest_unified_sentiment.json",
                     "--unified-sentiment-summary-json",
                     "output/v31_unified_sentiment/summary.json",
+                    "--policy-name",
+                    str(args.policy_name),
+                    "--policy-config-json",
+                    str(args.tuning_json),
                     "--output-dir",
                     "output/v31_ops_monitor",
                 ],
