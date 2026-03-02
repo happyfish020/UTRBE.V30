@@ -1,0 +1,45 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build / packaging artifacts
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Test / lint / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+release/
+
+# Runtime temp files
+*.log
+*.pid
+*.pid.lock
+*.tmp
+*.temp
+tmp/
+temp/
+.cache/
+
+# Project generated outputs
+/output/
+/logs/
+/release/**/output/
+
+# IDE / OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

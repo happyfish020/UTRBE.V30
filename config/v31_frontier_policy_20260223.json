@@ -1,0 +1,16 @@
+{
+    "mode":  "frontier_constrained",
+    "selected_on":  "2026-02-23",
+    "selected_run":  "v31_backtest_eval_step4_allocscan_48",
+    "selected_config":  "config/v31_phase_d_frontier_prod_20260223.json",
+    "source_config":  "config/v31_phase_d_step4_allocscan_48.json",
+    "cagr_impact_cap":  0.03,
+    "dd_reduction_floor":  0.25,
+    "lambdas":  [
+                    0.5,
+                    0.6,
+                    0.7
+                ],
+    "default_lambda":  0.7,
+    "notes":  "Use constrained frontier for production candidate selection."
+}

@@ -1,0 +1,19 @@
+﻿version: v30.0.1
+updated: 2026-02-22
+
+structural_target:
+  description: 10% drawdown within 30 trading days with >=15-day persistence
+  horizon_days: 30
+  drawdown_threshold: 0.10
+  persistence_days: 15
+
+shock_target:
+  description: 7% drop within 5 days with >=60% move in 2 days
+  horizon_days: 5
+  drop_threshold: 0.07
+  move_2d_threshold: 0.60
+
+acceptance_gate:
+  max_drawdown_reduction_min: 0.40
+  cagr_impact_max: 0.02
+  worst_window_auc_min: 0.60

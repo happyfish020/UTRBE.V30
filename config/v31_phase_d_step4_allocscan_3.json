@@ -1,0 +1,38 @@
+{
+    "v31_mode":  true,
+    "sds_gate_low":  0.35,
+    "sds_gate_high":  0.6,
+    "regime_bull_mult":  0.6,
+    "regime_neutral_mult":  1.0,
+    "regime_bear_mult":  1.5,
+    "struct_high_cut":  0.85,
+    "struct_risk_cut":  0.7,
+    "shock_high_cut":  0.4,
+    "shock_risk_cut":  0.2,
+    "v31_step_mode":  true,
+    "step_alloc_low":  1.0,
+    "step_alloc_medium":  0.82,
+    "step_alloc_high":  0.45,
+    "step_alloc_crisis":  0.2,
+    "base_bins":  [
+                      0.3,
+                      0.5,
+                      0.7,
+                      0.85
+                  ],
+    "base_allocs":  [
+                        1.0,
+                        0.8,
+                        0.6,
+                        0.3,
+                        0.1
+                    ],
+    "alloc_shock_high_cut":  0.4,
+    "alloc_shock_risk_cut":  0.2,
+    "tactical_multipliers":  [
+                                 1.0,
+                                 0.9,
+                                 0.8,
+                                 0.7
+                             ]
+}

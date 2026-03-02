@@ -1,0 +1,39 @@
+﻿version: v30.0.1
+updated: 2026-02-22
+
+market_data:
+  source_priority:
+    - local_csv
+    - database
+  local_csv_default: ../UTRBE/output/dualtrack_daily_pipeline_with_compare_2016/market_features.csv
+  required_columns:
+    - date
+    - vol20
+    - hurst_100
+    - drawdown_252
+    - ret5d
+  optional_columns:
+    - ret20d
+    - external_event
+    - is_trading_day
+    - breadth
+
+feature_output:
+  file: output/v30_features_daily.csv
+  primary_keys:
+    - date
+  derived_features:
+    - breadth_real_stress
+    - breadth_source_flag
+    - dd_delta_1d
+    - ret5d_delta_1d
+    - low_vol_flag
+    - high_hurst_flag
+    - drawdown_gt5_flag
+    - shock_like_flag
+    - new_lows_ratio_proxy
+    - ad_spread_proxy
+    - sector_sync_breakdown_proxy
+    - leadership_failure_proxy
+    - breadth_damage_score
+    - structural_pressure_score
