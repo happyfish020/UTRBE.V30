@@ -1,0 +1,49 @@
+{
+  "rows_total": 2525,
+  "rows_train": 2023,
+  "rows_test": 502,
+  "label_positive_rate_train": 0.03509639149777558,
+  "label_positive_rate_test": 0.0199203187250996,
+  "metrics": {
+    "auc": 0.7091463414634147,
+    "brier": 0.019142247614553305,
+    "fpr": 0.0,
+    "recall": 0.0
+  },
+  "calibration": "sigmoid",
+  "feature_columns": [
+    "ret5d",
+    "ret5d_delta_1d",
+    "dd_delta_1d",
+    "vol20",
+    "high_hurst_flag",
+    "shock_like_flag",
+    "drawdown_252",
+    "drawdown_gt5_flag",
+    "structural_pressure_score",
+    "hurst_100",
+    "external_event",
+    "breadth_real_stress",
+    "breadth_source_flag",
+    "low_vol_flag",
+    "new_lows_ratio_proxy",
+    "ad_spread_proxy",
+    "sector_sync_breakdown_proxy",
+    "leadership_failure_proxy",
+    "breadth_damage_score"
+  ],
+  "split_date": "2024-02-11",
+  "label_note": "proxy shock label from drawdown-path increase in next 5d",
+  "labeling": {
+    "horizon_days": 5,
+    "drop_threshold": 0.07,
+    "early_share_threshold": 0.5,
+    "adaptive_drop": true,
+    "target_positive_rate": 0.06,
+    "min_drop_threshold": 0.015,
+    "max_drop_threshold": 0.1,
+    "use_stress_override": true,
+    "stress_gate": 0.5,
+    "drop_threshold_used": 0.03747617165173083
+  }
+}

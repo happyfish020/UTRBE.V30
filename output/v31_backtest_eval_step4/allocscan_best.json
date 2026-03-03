@@ -1,0 +1,9 @@
+{
+    "id":  50,
+    "step_alloc_medium":  0.9,
+    "step_alloc_high":  0.45,
+    "step_alloc_crisis":  0.15,
+    "cagr_impact":  0.026234277870818,
+    "dd_reduction":  0.28994856421071807,
+    "score":  0.44644002102794578
+}

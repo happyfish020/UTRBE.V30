@@ -1,0 +1,47 @@
+{
+  "source": "d:\\LHJ\\PythonWS\\UTRBE.V30\\output\\v31_backtest_eval_recovery_accel\\v30_backtest_daily.csv",
+  "window": {
+    "start": "2016-01-04",
+    "end": "2026-02-19",
+    "rows": 2547
+  },
+  "strategy_metrics": {
+    "days": 2547,
+    "start": "2016-01-04",
+    "end": "2026-02-19",
+    "cagr": 0.10306246966881472,
+    "max_drawdown": -0.1362998330926043,
+    "sharpe": 0.9840076906386828,
+    "calmar": 0.7561452375278583,
+    "win_rate": 0.5543776992540244
+  },
+  "benchmark_metrics": {
+    "days": 2547,
+    "start": "2016-01-04",
+    "end": "2026-02-19",
+    "cagr": 0.14779514887523582,
+    "max_drawdown": -0.3371726416016424,
+    "sharpe": 0.8586788906295463,
+    "calmar": 0.4383367172768738,
+    "win_rate": 0.5543776992540244
+  },
+  "risk_trigger_stats": {
+    "label1_ratio": 0.6497840596780526,
+    "trigger_count": 152,
+    "avg_triggers_per_year": 15.038869257950529,
+    "avg_duration_days": 10.888157894736842,
+    "max_duration_days": 349,
+    "trade_count": 863
+  },
+  "crisis_2020": {
+    "crash_day": "2020-03-16",
+    "crash_spy_ret1d": -0.1094238584381226,
+    "last_precrash_trigger_date": "2020-01-24",
+    "lead_trading_days": 35
+  },
+  "has_2008_in_window": false,
+  "outputs": {
+    "timeline_2020_csv": "d:\\LHJ\\PythonWS\\UTRBE.V30\\output\\v31_backtest_eval_recovery_accel\\analysis_timeline_2020.csv",
+    "overlay_png": "d:\\LHJ\\PythonWS\\UTRBE.V30\\output\\v31_backtest_eval_recovery_accel\\analysis_10y_equity_risk_overlay.png"
+  }
+}

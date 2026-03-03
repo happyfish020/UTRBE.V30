@@ -1,0 +1,44 @@
+{
+  "splits": 5,
+  "test_years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "avg_test": {
+    "cagr_impact": 0.024670393694469127,
+    "dd_reduction": 0.06442057916682753,
+    "sharpe_diff": -0.14626653723220295,
+    "calmar_diff": -0.16258235622216452,
+    "sharpe_win_rate": 0.2,
+    "calmar_win_rate": 0.2,
+    "dd_reduction_positive_rate": 0.8
+  },
+  "oos_concat": {
+    "oos_start": "2020-01-02",
+    "oos_end": "2024-12-31",
+    "oos_days": 1258,
+    "strategy": {
+      "cagr": 0.031117131765124872,
+      "mdd": -0.3178230450378735,
+      "sharpe": 0.27579390635148066,
+      "calmar": 0.09790709720692779,
+      "n_days": 1258
+    },
+    "benchmark": {
+      "cagr": 0.05370842592462233,
+      "mdd": -0.34440675946015353,
+      "sharpe": 0.3740630749853612,
+      "calmar": 0.15594474977439046,
+      "n_days": 1258
+    },
+    "comparison": {
+      "cagr_impact": 0.022591294159497455,
+      "dd_reduction": 0.07718697061564395,
+      "sharpe_diff": -0.09826916863388052,
+      "calmar_diff": -0.05803765256746267
+    }
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "trigger_density": {
+    "annual_counts": [
+      {
+        "year": 2024,
+        "trigger_episodes": 5
+      },
+      {
+        "year": 2025,
+        "trigger_episodes": 5
+      },
+      {
+        "year": 2026,
+        "trigger_episodes": 0
+      }
+    ],
+    "avg_triggers_per_year": 3.3333333333333335,
+    "avg_episode_days": 4.5,
+    "avg_recovery_days_to_95pct_alloc": 18.2
+  },
+  "trend_miss_proxy": {
+    "episode_miss_ratio": 0.0,
+    "definition": "bench_ret_20d>3% and benchmark-strategy spread>2% from trigger start"
+  },
+  "liquidation_check": {
+    "full_liquidation_episode_ratio_min_alloc_le_5pct": 0.0,
+    "full_liquidation_days": 0,
+    "total_days": 478
+  },
+  "threshold_strength_curve": [
+    {
+      "factor": 0.9,
+      "cagr_impact": 0.02925876239940295,
+      "dd_reduction": 0.3345396267466911,
+      "breadth_crisis_days": 10,
+      "trend_cap_days": 2
+    },
+    {
+      "factor": 1.0,
+      "cagr_impact": 0.01363814192818169,
+      "dd_reduction": 0.40131054938622435,
+      "breadth_crisis_days": 4,
+      "trend_cap_days": 3
+    },
+    {
+      "factor": 1.1,
+      "cagr_impact": 0.014568541238155763,
+      "dd_reduction": 0.4005469032673315,
+      "breadth_crisis_days": 2,
+      "trend_cap_days": 3
+    }
+  ],
+  "cagr_compare_hardgate_off_on": {
+    "hardgate_off_frontier_prod_annualized_return": 0.1746096173413918,
+    "hardgate_on_gatepass_annualized_return": 0.1872057532840281,
+    "delta_on_minus_off": 0.01259613594263631,
+    "hardgate_off_cagr_impact": 0.026234277870818,
+    "hardgate_on_cagr_impact": 0.01363814192818169
+  },
+  "episodes": [
+    {
+      "start_date": "2024-06-14",
+      "end_date": "2024-06-17",
+      "reason_major": "CREDIT_HIGH",
+      "days": 2,
+      "min_alloc": 0.45,
+      "mean_alloc": 0.725,
+      "recovery_days_to_95pct": 1,
+      "bench_ret_20d_from_start": 0.044671853308294374,
+      "strat_ret_20d_from_start": 0.03852056102360235,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2024-08-01",
+      "end_date": "2024-08-13",
+      "reason_major": "CREDIT_HIGH",
+      "days": 9,
+      "min_alloc": 0.315,
+      "mean_alloc": 0.415,
+      "recovery_days_to_95pct": 2,
+      "bench_ret_20d_from_start": 0.013689181493642621,
+      "strat_ret_20d_from_start": 0.010096429018417119,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2024-12-09",
+      "end_date": "2024-12-10",
+      "reason_major": "BREADTH_CRISIS",
+      "days": 2,
+      "min_alloc": 0.3,
+      "mean_alloc": 0.65,
+      "recovery_days_to_95pct": 1,
+      "bench_ret_20d_from_start": -0.026876809805093327,
+      "strat_ret_20d_from_start": -0.03162108394547991,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2024-12-18",
+      "end_date": "2024-12-20",
+      "reason_major": "BREADTH_CRISIS",
+      "days": 3,
+      "min_alloc": 0.3,
+      "mean_alloc": 0.52,
+      "recovery_days_to_95pct": 2,
+      "bench_ret_20d_from_start": 0.0013067847711647484,
+      "strat_ret_20d_from_start": -0.007904410985455912,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2024-12-30",
+      "end_date": "2025-01-02",
+      "reason_major": "BREADTH_CRISIS",
+      "days": 3,
+      "min_alloc": 0.3,
+      "mean_alloc": 0.5833333333333334,
+      "recovery_days_to_95pct": 1,
+      "bench_ret_20d_from_start": 0.016856843754648132,
+      "strat_ret_20d_from_start": 0.015188141157285395,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2025-02-25",
+      "end_date": "2025-02-26",
+      "reason_major": "CREDIT_HIGH",
+      "days": 2,
+      "min_alloc": 0.36,
+      "mean_alloc": 0.5800000000000001,
+      "recovery_days_to_95pct": 56,
+      "bench_ret_20d_from_start": -0.033520529891165496,
+      "strat_ret_20d_from_start": -0.009077942560360985,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2025-02-28",
+      "end_date": "2025-03-05",
+      "reason_major": "CREDIT_HIGH",
+      "days": 4,
+      "min_alloc": 0.36,
+      "mean_alloc": 0.50625,
+      "recovery_days_to_95pct": 51,
+      "bench_ret_20d_from_start": -0.04737792164448129,
+      "strat_ret_20d_from_start": -0.023271462649787744,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2025-03-06",
+      "end_date": "2025-03-19",
+      "reason_major": "CREDIT_HIGH",
+      "days": 10,
+      "min_alloc": 0.315,
+      "mean_alloc": 0.42750000000000005,
+      "recovery_days_to_95pct": 41,
+      "bench_ret_20d_from_start": -0.07674251660881015,
+      "strat_ret_20d_from_start": -0.05925204683827234,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2025-04-03",
+      "end_date": "2025-04-10",
+      "reason_major": "CREDIT_HIGH",
+      "days": 6,
+      "min_alloc": 0.2204999999999999,
+      "mean_alloc": 0.35974999999999996,
+      "recovery_days_to_95pct": 25,
+      "bench_ret_20d_from_start": 0.003968048398325097,
+      "strat_ret_20d_from_start": 0.025251648779083924,
+      "trend_miss_flag": false
+    },
+    {
+      "start_date": "2025-10-10",
+      "end_date": "2025-10-15",
+      "reason_major": "CREDIT_HIGH",
+      "days": 4,
+      "min_alloc": 0.36,
+      "mean_alloc": 0.5175,
+      "recovery_days_to_95pct": 2,
+      "bench_ret_20d_from_start": -0.00028311124666624554,
+      "strat_ret_20d_from_start": -0.014419233001558007,
+      "trend_miss_flag": false
+    }
+  ]
+}

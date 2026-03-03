@@ -1,0 +1,2 @@
+﻿start_date,trough_date,end_date,drawdown_depth,event_len,recovery_len,recovered_target,a_recovery_amplitude,b_recovery_speed,curve_r2,rss,rsts,t50
+2025-04-04,2025-04-04,2025-06-27,-0.1687714509895738,4,13,True,1.086327887180609,0.16842648990143896,0.9301076419816806,0.9295881807536683,1.086327887180609,3.661414600809248

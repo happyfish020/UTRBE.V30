@@ -1,0 +1,32 @@
+{
+  "struct_high_cut": 0.85,
+  "struct_risk_cut": 0.7,
+  "shock_high_cut": 0.85,
+  "shock_risk_cut": 0.6,
+  "base_bins": [
+    0.2,
+    0.4,
+    0.6,
+    0.8
+  ],
+  "base_allocs": [
+    1.0,
+    0.8,
+    0.6,
+    0.3,
+    0.1
+  ],
+  "alloc_shock_high_cut": 0.85,
+  "alloc_shock_risk_cut": 0.7,
+  "tactical_multipliers": [
+    1.0,
+    0.85,
+    0.7,
+    0.55
+  ],
+  "scan_meta": {
+    "candidate_count": 81,
+    "acceptance_pass_count": 0,
+    "selection_reason": "No candidate passed both gates; selected best constrained trade-off."
+  }
+}

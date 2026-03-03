@@ -1,0 +1,16 @@
+{
+  "sds_low": 0.35,
+  "sds_high": 0.6,
+  "bull": 0.7,
+  "bear": 1.4,
+  "step_alloc_medium": 0.75,
+  "step_alloc_high": 0.45,
+  "step_alloc_crisis": 0.1,
+  "tac1": 0.8,
+  "tac2": 0.7,
+  "tac3": 0.6,
+  "cagr_impact": 0.04710340631200194,
+  "dd_reduction": 0.27470034835389995,
+  "score": 0.251148645197899,
+  "avg_alloc": 0.8959119496855347
+}

@@ -166,3 +166,52 @@ early_score = sigmoid(early_score_raw)
 1. 将报告中的“趋势条件”从“无法判定”升级为明确的 `price vs MA100` 状态（需在报告输入保留 `market_price`）。
 2. 对 Forward Walk 负迁移年份（2021~2024）做分层归因（shock/structural/early/tactical 各层贡献）。
 3. 在不降低 `dd_reduction` 的前提下，继续压缩 `cagr_impact` 到 `<2%`。
+
+## 10. 补充：全面回测与分层信号回归
+
+### 10.1 全面回测（结构层 / 冲击层 / Early / Tactical）
+- 全样本（2016-01-04 ~ 2026-03-02）：`cagr_impact = 0.023688`，`dd_reduction = 0.470741`。
+- Rolling 5Y（66 个窗口）：平均 `cagr_impact = 0.014499`，平均 `dd_reduction = 0.460424`。
+- Forward Walk（2020~2024）：平均 `cagr_impact = 0.024670`，平均 `dd_reduction = 0.064421`。
+- 杠杆与压力：主版本 `1.15x`，上限 `1.2x`；单段 `-40%` 冲击压力下，策略回撤仍小于 benchmark 同期冲击损失。
+
+### 10.2 分层信号（预警 / 恢复 / 战术动作）
+- 结构层（Structural）：用于识别中期结构恶化，决定中期风险方向。
+- 冲击层（Shock）：用于识别短期突发风险，决定临时防守强度。
+- Early 层：Top15%/Top5% 预警时做轻降仓（`1.0 -> 0.9 -> 0.8`），不是 hard gate。
+- 恢复层（Lowfreq Recovery）：用于确认或否决短期预警，不直接替代短期信号。
+- Tactical 层：根据 gate 与 tactical level 执行 `LIGHT_REDUCE/FULL_RISK_ON/REDUCE_TO_15_35` 等动作。
+
+### 10.3 回归验证（3 个案例）
+- Case-1（2025-02-21，预警确认）：短期预警 + 恢复弱，执行 `LIGHT_REDUCE`（0.80），行为符合预期，`PASS`。
+- Case-2（2026-02-19，恢复否决预警）：恢复强（RSS=0.930, RStS=1.086），执行 `FULL_RISK_ON`（1.00），行为符合预期，`PASS`。
+- Case-3（2026-02-27，执行护栏）：跨层预警/数据新鲜度约束触发，执行 `REDUCE_TO_15_35`（0.30），行为符合预期，`PASS`。
+
+结论：结构层、冲击层、Early 预警与恢复信号、Tactical 动作在 3 个回归场景中均按设计生效。
+
+## 11. 再次全面回测（2026-03-02）与回归cases更新
+
+### 11.1 本次重新回测结论（全样本）
+- 区间：`2016-01-04 ~ 2026-03-02`（2554 rows）
+- `cagr_impact = 0.015132`
+- `dd_reduction = 0.236627`
+- 门槛检查：`cagr_impact < 2%` 通过；`dd_reduction >= 40%` 未通过。
+
+### 11.2 分层信号（结构 / 冲击 / Early / 恢复 / Tactical）
+- 结构层：today/20d = `0.003 / 0.005`
+- 冲击层：today/20d = `0.033 / 0.041`
+- Early 层：today/20d = `0.558 / 0.465`，`level=0`，`multiplier=1.00`
+- 恢复信号（lowfreq latest）：`gate=ALERT`，`action_hint=REDUCE`，`RSS=0.000`，`RStS=0.000`
+- Tactical（today）：`FULL_RISK_ON`，`final_allocation=1.00`
+
+### 11.3 回归cases（按新口径）
+- Case-A：`2025-03`
+  - `rows=21`，`early_warn_days=21`，`tactical_active_days=21`，`hardgate_days=11`
+  - `alloc_range=[0.315, 0.900]`
+  - 结论：高压期由结构层 + hard gate + tactical 主导，Early 全月预警。
+- Case-B：`2025-11`
+  - `rows=19`，`early_warn_days=0`，`tactical_active_days=10`，`hardgate_days=0`
+  - `alloc_range=[0.800, 1.000]`
+  - 结论：主要为 Tactical 轻降仓，结构/冲击总体低压，Early 未触发。
+
+明细文件：`output/v31_ops_monitor_rebacktest_full_20260302/regression_cases_2025_03_2025_11_report.md`

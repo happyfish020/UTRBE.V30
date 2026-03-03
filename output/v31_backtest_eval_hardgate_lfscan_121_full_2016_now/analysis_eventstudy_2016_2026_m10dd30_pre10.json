@@ -1,0 +1,54 @@
+{
+  "window": {
+    "start": "2016-01-04",
+    "end": "2026-03-02",
+    "rows": 2554
+  },
+  "event_definition": {
+    "market_event": "future 30-trading-day benchmark drawdown reaches <= -10%",
+    "distance_condition": "first hit day <= 10",
+    "analyzed_points": "10 trading days before dates satisfying distance condition"
+  },
+  "counts": {
+    "event_dates_distance_le_10": 42,
+    "pre10_samples": 42
+  },
+  "stats": {
+    "vol20": {
+      "n_pre10": 42,
+      "n_baseline": 2512,
+      "mean_pre10": 0.011519955644473237,
+      "mean_baseline": 0.009071224865537537,
+      "diff_pre10_minus_baseline": 0.0024487307789357003,
+      "z_approx": 3.3828359725006476,
+      "p_two_sided_approx": 0.0007174146687876082,
+      "cohen_d": 0.3950940708081719,
+      "median_pre10": 0.0109985566216736,
+      "median_baseline": 0.0074591760876041
+    },
+    "ret5d": {
+      "n_pre10": 42,
+      "n_baseline": 2512,
+      "mean_pre10": -0.011929223499836933,
+      "mean_baseline": 0.0031632815365364463,
+      "diff_pre10_minus_baseline": -0.015092505036373379,
+      "z_approx": -3.06685659179211,
+      "p_two_sided_approx": 0.0021632261395980734,
+      "cohen_d": -0.6815241123684316,
+      "median_pre10": -0.00664308300657735,
+      "median_baseline": 0.00458286262034685
+    },
+    "breadth_damage_score": {
+      "n_pre10": 42,
+      "n_baseline": 2512,
+      "mean_pre10": 0.3045253079179553,
+      "mean_baseline": 0.26570965025394766,
+      "diff_pre10_minus_baseline": 0.03881565766400763,
+      "z_approx": 1.3157606619821576,
+      "p_two_sided_approx": 0.18825438647345205,
+      "cohen_d": 0.2127322132895143,
+      "median_pre10": 0.2490150311770153,
+      "median_baseline": 0.22871377279208532
+    }
+  }
+}

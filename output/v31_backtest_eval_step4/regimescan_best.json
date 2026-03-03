@@ -1,0 +1,10 @@
+{
+    "id":  67,
+    "sds_gate_low":  0.4,
+    "sds_gate_high":  0.6,
+    "regime_bull_mult":  0.7,
+    "regime_bear_mult":  1.5,
+    "cagr_impact":  0.026234277870818,
+    "dd_reduction":  0.28994856421071807,
+    "score":  0.44644002102794578
+}

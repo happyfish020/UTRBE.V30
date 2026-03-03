@@ -1,0 +1,20 @@
+{
+  "splits": 6,
+  "test_years": [
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025"
+  ],
+  "test_vs_benchmark": {
+    "cagr_impact_mean": 0.007345691738258923,
+    "dd_reduction_mean": 0.28414061093282234,
+    "sharpe_diff_mean": 0.07248731589403713,
+    "calmar_diff_mean": 0.1892692796514386,
+    "sharpe_win_rate": 0.3333333333333333,
+    "calmar_win_rate": 0.3333333333333333,
+    "dd_reduction_positive_rate": 1.0
+  }
+}

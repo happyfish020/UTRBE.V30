@@ -1,0 +1,16 @@
+{
+  "input_csv": "..\\UTRBE\\output\\dualtrack_daily_pipeline_with_compare_2016\\market_features.csv",
+  "output_csv": "output\\v30_features_daily.csv",
+  "rows": 1,
+  "input_table": "market_features_daily",
+  "input_start": "2026-03-03",
+  "input_end": "2026-03-03",
+  "output_table": "v30_features_daily",
+  "upsert_rows": 1,
+  "breadth_csv": "..\\UTRBE\\output\\full_2006_2026.csv",
+  "breadth_date_col": "date",
+  "breadth_value_col": "breadth",
+  "breadth_price_col": "price",
+  "breadth_credit_col": "credit",
+  "breadth_coverage": 0.0
+}

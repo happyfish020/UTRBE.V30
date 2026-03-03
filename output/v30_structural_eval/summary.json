@@ -1,0 +1,10 @@
+{
+  "windows": 4,
+  "worst_auc": 0.755846422338569,
+  "mean_auc": 0.8460006660352029,
+  "mean_fpr": 0.10469006568144498,
+  "calibration": "sigmoid",
+  "train_years": 3,
+  "test_years": 1,
+  "step_years": 1
+}
