@@ -700,6 +700,7 @@ def main() -> None:
     p.add_argument("--artifact-registry-table", default="v31_output_artifact_registry_daily")
     p.add_argument("--market-tz", default="America/New_York")
     p.add_argument("--market-close-hhmm", default="16:00", help="Market close cutoff in HH:MM local market time.")
+    p.add_argument("--enable-intraday", action="store_true", help="Enable intraday mode/guards and intraday wording in report.")
     p.add_argument(
         "--intraday-policy",
         default="mark",
@@ -803,21 +804,37 @@ def main() -> None:
         market_tz=str(args.market_tz),
         close_hhmm=str(args.market_close_hhmm),
     )
-    intraday_mode = bool(is_intraday and str(args.intraday_policy).lower() != "allow")
-    intraday_guard = _intraday_guardrail(
-        engine=engine,
-        trade_date=trade_date,
-        intraday_dir=str(args.intraday_dir).strip(),
-        intraday_ts_col=str(args.intraday_ts_col),
-        intraday_price_col=str(args.intraday_price_col),
-        ref_daily_table=str(args.intraday_ref_daily_table),
-        ref_daily_date_col=str(args.intraday_ref_date_col),
-        ref_daily_close_col=str(args.intraday_ref_close_col),
-        warn_drop_pct=float(args.intraday_warn_drop_pct),
-        alert_drop_pct=float(args.intraday_alert_drop_pct),
-        warn_5m_drop_pct=float(args.intraday_warn_5m_drop_pct),
-        alert_5m_drop_pct=float(args.intraday_alert_5m_drop_pct),
-    )
+    intraday_enabled = bool(args.enable_intraday)
+    intraday_mode = bool(intraday_enabled and is_intraday and str(args.intraday_policy).lower() != "allow")
+    intraday_guard = {
+        "enabled": False,
+        "status": "DISABLED",
+        "level": "NA",
+        "latest_price": None,
+        "open_price": None,
+        "prev_close": None,
+        "drop_vs_prev_close": None,
+        "low_drop_vs_prev_close": None,
+        "drop_vs_open": None,
+        "drop_5m": None,
+        "action_hint": "NONE",
+        "reason": "intraday disabled",
+    }
+    if intraday_enabled:
+        intraday_guard = _intraday_guardrail(
+            engine=engine,
+            trade_date=trade_date,
+            intraday_dir=str(args.intraday_dir).strip(),
+            intraday_ts_col=str(args.intraday_ts_col),
+            intraday_price_col=str(args.intraday_price_col),
+            ref_daily_table=str(args.intraday_ref_daily_table),
+            ref_daily_date_col=str(args.intraday_ref_date_col),
+            ref_daily_close_col=str(args.intraday_ref_close_col),
+            warn_drop_pct=float(args.intraday_warn_drop_pct),
+            alert_drop_pct=float(args.intraday_alert_drop_pct),
+            warn_5m_drop_pct=float(args.intraday_warn_5m_drop_pct),
+            alert_5m_drop_pct=float(args.intraday_alert_5m_drop_pct),
+        )
 
     p_struct = float(pd.to_numeric(latest_row.get("p_structural", 0.0), errors="coerce"))
     p_shock = float(pd.to_numeric(latest_row.get("p_shock", 0.0), errors="coerce"))
@@ -860,6 +877,7 @@ def main() -> None:
         "health_checks": health,
         "report_context": {
             "is_intraday_snapshot": bool(is_intraday),
+            "intraday_enabled": bool(intraday_enabled),
             "intraday_policy": str(args.intraday_policy),
             "market_tz": str(args.market_tz),
             "market_close_hhmm": str(args.market_close_hhmm),
@@ -927,7 +945,7 @@ def main() -> None:
     v2_warn = str(v2.get("warning_level", "NA")).upper() if v2 else "NA"
     if v2_warn in {"WATCH", "ALERT", "SHORT"} and latest_action.upper() == "FULL_RISK_ON":
         signal_alerts.append(f"V2 预警层为 {v2_warn}，但执行层仍 FULL_RISK_ON。")
-    if intraday_guard.get("status") == "OK" and str(intraday_guard.get("level", "NA")).upper() in {"WARN", "ALERT"}:
+    if intraday_enabled and intraday_guard.get("status") == "OK" and str(intraday_guard.get("level", "NA")).upper() in {"WARN", "ALERT"}:
         signal_alerts.append(
             f"盘中快控触发 {intraday_guard.get('level')}（{intraday_guard.get('reason', '')}），建议临时动作={intraday_guard.get('action_hint')}"
         )
@@ -1083,33 +1101,34 @@ def main() -> None:
                 "- 数据与信号可能在收盘前继续变化，收盘后版本才作为正式日报。",
             ]
         )
-    lines.extend(
-        [
-            "",
-            "## 盘中快控补丁（分钟级）",
-            f"- 状态：{intraday_guard.get('status')} | 级别：{intraday_guard.get('level')} | 临时动作建议：{intraday_guard.get('action_hint')}",
-            f"- 触发依据：{intraday_guard.get('reason')}",
-        ]
-    )
-    if intraday_guard.get("status") == "OK":
-        d_prev = intraday_guard.get("drop_vs_prev_close")
-        d_low_prev = intraday_guard.get("low_drop_vs_prev_close")
-        d_open = intraday_guard.get("drop_vs_open")
-        d_5m = intraday_guard.get("drop_5m")
+    if intraday_enabled:
         lines.extend(
             [
-                f"- 最新价/昨收跌幅：{d_prev:.2%}" if isinstance(d_prev, float) else "- 最新价/昨收跌幅：NA",
-                f"- 日内最低/昨收跌幅：{d_low_prev:.2%}" if isinstance(d_low_prev, float) else "- 日内最低/昨收跌幅：NA",
-                f"- 最新价/今开跌幅：{d_open:.2%}" if isinstance(d_open, float) else "- 最新价/今开跌幅：NA",
-                f"- 最近5分钟跌幅：{d_5m:.2%}" if isinstance(d_5m, float) else "- 最近5分钟跌幅：NA",
+                "",
+                "## 盘中快控补丁（分钟级）",
+                f"- 状态：{intraday_guard.get('status')} | 级别：{intraday_guard.get('level')} | 临时动作建议：{intraday_guard.get('action_hint')}",
+                f"- 触发依据：{intraday_guard.get('reason')}",
             ]
         )
+        if intraday_guard.get("status") == "OK":
+            d_prev = intraday_guard.get("drop_vs_prev_close")
+            d_low_prev = intraday_guard.get("low_drop_vs_prev_close")
+            d_open = intraday_guard.get("drop_vs_open")
+            d_5m = intraday_guard.get("drop_5m")
+            lines.extend(
+                [
+                    f"- 最新价/昨收跌幅：{d_prev:.2%}" if isinstance(d_prev, float) else "- 最新价/昨收跌幅：NA",
+                    f"- 日内最低/昨收跌幅：{d_low_prev:.2%}" if isinstance(d_low_prev, float) else "- 日内最低/昨收跌幅：NA",
+                    f"- 最新价/今开跌幅：{d_open:.2%}" if isinstance(d_open, float) else "- 最新价/今开跌幅：NA",
+                    f"- 最近5分钟跌幅：{d_5m:.2%}" if isinstance(d_5m, float) else "- 最近5分钟跌幅：NA",
+                ]
+            )
     if data_alerts or signal_alerts:
         lines.extend(
             [
                 "",
-                "## 关键告警",
-                *([f"- 数据质量：{x}" for x in data_alerts] if data_alerts else ["- 数据质量：无"]),
+                "## 关键告警（数据新鲜度）",
+                *([f"- 数据新鲜度：{x}" for x in data_alerts] if data_alerts else ["- 数据新鲜度：无"]),
                 *([f"- 信号冲突：{x}" for x in signal_alerts] if signal_alerts else ["- 信号冲突：无"]),
             ]
         )
