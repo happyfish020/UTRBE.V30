@@ -39,7 +39,7 @@ temp/
 #/output/
 /logs/
 /release/**/output/
-#/artifacts/archive/
+/artifacts/archive/
 
 # IDE / OS files
 .idea/
