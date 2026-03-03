@@ -1,0 +1,17 @@
+{
+  "windows": 6,
+  "worst_auc": 0.46586345381526106,
+  "mean_auc": 0.7752318007895012,
+  "mean_fpr": 0.0014184397163120568,
+  "calibration": "sigmoid",
+  "train_years": 3,
+  "test_years": 1,
+  "step_years": 1,
+  "label_note": "proxy shock label from drawdown-path increase in next 5d",
+  "labeling": {
+    "adaptive_drop": true,
+    "target_positive_rate": 0.04,
+    "use_stress_override": true,
+    "stress_gate": 0.55
+  }
+}

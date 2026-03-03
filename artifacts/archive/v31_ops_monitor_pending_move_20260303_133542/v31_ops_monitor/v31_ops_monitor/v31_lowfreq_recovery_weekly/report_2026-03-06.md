@@ -1,0 +1,11 @@
+﻿# 低频恢复层日报
+
+- 频率: weekly
+- 区间: 2026-03-06 -> 2026-03-06
+- 当前大级别回撤中: False
+- Recovery Speed Score (RSS): 0.0000
+- Recovery Strength Score (RStS): 0.0000
+- Persistence Adjustment: 0.0000
+- Gate: ALERT
+- ActionHint: REDUCE
+- 短期战术确认: CONFIRM_SHORT_TERM_WARNING

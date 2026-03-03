@@ -1,7 +1,0 @@
-warning_level,signal_stage,warning_sources,days,first_date,last_date
-MEDIUM,PREWARNING,lead10_probability|lead10_second_opinion|lead5_probability|reduce_rule,11,2020-03-10,2025-04-10
-MEDIUM,PREWARNING,lead10_probability|lead10_second_opinion|lead5_probability|reduce_rule|sentiment_factor,3,2020-03-09,2025-04-04
-HIGH,DAMAGE_CONTROL,any_track_high_risk|lead10_probability|lead5_probability|reduce_rule,5,2022-05-11,2022-09-29
-HIGH,DAMAGE_CONTROL,any_track_high_risk|lead10_probability|lead5_probability|reduce_rule|sentiment_factor,4,2022-05-09,2022-06-16
-MEDIUM,PREWARNING,lead10_probability|lead5_probability|lead5_watch_zone|reduce_rule|sentiment_factor,1,2018-11-20,2018-11-20
-MEDIUM,PREWARNING,lead10_probability|lead10_second_opinion|lead5_probability|lead5_watch_zone|reduce_rule,1,2018-10-26,2018-10-26

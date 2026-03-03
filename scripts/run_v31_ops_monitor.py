@@ -1,10 +1,13 @@
 ﻿from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote_plus
+from zoneinfo import ZoneInfo
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -71,6 +74,217 @@ def _read_table(engine: Engine, table_name: str, start: str = "", end: str = "")
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"])
     return df
+
+
+def _list_intraday_files(intraday_dir: Path) -> list[Path]:
+    if not intraday_dir.exists():
+        return []
+    exts = {".csv", ".parquet", ".pq"}
+    return sorted([p for p in intraday_dir.rglob("*") if p.is_file() and p.suffix.lower() in exts], key=lambda x: x.stat().st_mtime, reverse=True)
+
+
+def _detect_col(cols: list[str], preferred: str, candidates: list[str]) -> str | None:
+    lower_map = {str(c).lower(): str(c) for c in cols}
+    if str(preferred).strip() and str(preferred).lower() in lower_map:
+        return lower_map[str(preferred).lower()]
+    for c in candidates:
+        if c.lower() in lower_map:
+            return lower_map[c.lower()]
+    return None
+
+
+def _read_intraday_file(path: Path, ts_col: str, price_col: str) -> tuple[pd.DataFrame, float | None]:
+    if path.suffix.lower() == ".csv":
+        df = pd.read_csv(path)
+    else:
+        df = pd.read_parquet(path)
+    if df.empty:
+        return pd.DataFrame(columns=["ts", "px"]), None
+    cols = [str(c) for c in df.columns]
+    use_ts = _detect_col(cols, ts_col, ["datetime", "timestamp", "ts", "time", "dt", "date"])
+    use_px = _detect_col(cols, price_col, ["close", "last", "price", "px", "adj_close"])
+    if use_ts is None or use_px is None:
+        return pd.DataFrame(columns=["ts", "px"]), None
+
+    x = df.copy()
+    x["ts"] = pd.to_datetime(x[use_ts], errors="coerce")
+    x["px"] = pd.to_numeric(x[use_px], errors="coerce")
+    x = x.dropna(subset=["ts", "px"]).sort_values("ts").reset_index(drop=True)
+    if x.empty:
+        return x, None
+
+    prev_close = None
+    prev_close_col = _detect_col(cols, "", ["prev_close", "preclose", "prevclose", "yclose"])
+    if prev_close_col is not None:
+        s = pd.to_numeric(df[prev_close_col], errors="coerce").dropna()
+        if not s.empty:
+            prev_close = float(s.iloc[-1])
+    return x, prev_close
+
+
+def _read_prev_close(
+    engine: Engine,
+    table_name: str,
+    trade_date: str,
+    date_col: str = "date",
+    close_col: str = "close",
+) -> float | None:
+    q_table = _quote(table_name)
+    q_date = _quote(date_col)
+    q_close = _quote(close_col)
+    sql = (
+        f"SELECT {q_close} AS c "
+        f"FROM {q_table} "
+        f"WHERE {q_date} < :d "
+        f"ORDER BY {q_date} DESC "
+        "LIMIT 1"
+    )
+    with engine.connect() as conn:
+        df = pd.read_sql_query(text(sql), conn, params={"d": str(trade_date)})
+    if df.empty:
+        return None
+    x = pd.to_numeric(df.iloc[0]["c"], errors="coerce")
+    if pd.isna(x):
+        return None
+    return float(x)
+
+
+def _intraday_guardrail(
+    engine: Engine,
+    trade_date: str,
+    intraday_dir: str,
+    intraday_ts_col: str,
+    intraday_price_col: str,
+    ref_daily_table: str,
+    ref_daily_date_col: str,
+    ref_daily_close_col: str,
+    warn_drop_pct: float,
+    alert_drop_pct: float,
+    warn_5m_drop_pct: float,
+    alert_5m_drop_pct: float,
+) -> dict:
+    out = {
+        "enabled": bool(str(intraday_dir).strip()),
+        "status": "UNAVAILABLE",
+        "level": "NA",
+        "latest_price": None,
+        "open_price": None,
+        "prev_close": None,
+        "drop_vs_prev_close": None,
+        "low_drop_vs_prev_close": None,
+        "drop_vs_open": None,
+        "drop_5m": None,
+        "action_hint": "NONE",
+        "reason": "",
+    }
+    if not out["enabled"]:
+        out["reason"] = "intraday dir not configured"
+        return out
+
+    base = Path(str(intraday_dir))
+    cand_dirs = [base]
+    if not base.is_absolute():
+        cand_dirs.append((Path.cwd() / base).resolve())
+        cand_dirs.append((Path(__file__).resolve().parents[1] / base).resolve())
+        cand_dirs.append((Path(__file__).resolve().parents[2] / "UTRBE" / base).resolve())
+    files: list[Path] = []
+    seen: set[str] = set()
+    for d in cand_dirs:
+        for f in _list_intraday_files(d):
+            k = str(f.resolve())
+            if k not in seen:
+                files.append(f)
+                seen.add(k)
+    if not files:
+        out["reason"] = f"no intraday files found under: {intraday_dir}"
+        return out
+
+    tstr = str(trade_date)
+    files = sorted(files, key=lambda p: (0 if tstr in p.name else 1, -p.stat().st_mtime))
+    intra = pd.DataFrame(columns=["ts", "px"])
+    prev_close = None
+    for fp in files:
+        try:
+            x, pc = _read_intraday_file(fp, ts_col=intraday_ts_col, price_col=intraday_price_col)
+        except Exception:
+            continue
+        if x.empty:
+            continue
+        xt = x[pd.to_datetime(x["ts"]).dt.date == pd.to_datetime(trade_date).date()].copy()
+        if xt.empty:
+            continue
+        intra = xt.sort_values("ts").reset_index(drop=True)
+        prev_close = pc
+        # try infer prev_close from same file previous date if missing
+        if prev_close is None:
+            xp = x[pd.to_datetime(x["ts"]).dt.date < pd.to_datetime(trade_date).date()].copy()
+            if not xp.empty:
+                prev_close = float(xp.sort_values("ts")["px"].iloc[-1])
+        break
+
+    if intra.empty:
+        out["reason"] = f"no intraday rows for {trade_date} in files"
+        return out
+    if prev_close is None or prev_close <= 0:
+        try:
+            prev_close = _read_prev_close(
+                engine=engine,
+                table_name=ref_daily_table,
+                trade_date=trade_date,
+                date_col=ref_daily_date_col,
+                close_col=ref_daily_close_col,
+            )
+        except Exception:
+            prev_close = None
+    if prev_close is None or prev_close <= 0:
+        out["reason"] = "prev close not available (file+db)"
+        return out
+
+    latest = float(intra["px"].iloc[-1])
+    open_px = float(intra["px"].iloc[0])
+    low_px = float(intra["px"].min())
+    drop_prev = latest / prev_close - 1.0
+    low_drop_prev = low_px / prev_close - 1.0
+    drop_open = latest / open_px - 1.0 if open_px > 0 else None
+
+    ts_last = pd.to_datetime(intra["ts"].iloc[-1])
+    cutoff = ts_last - pd.Timedelta(minutes=5)
+    base = intra.loc[intra["ts"] <= cutoff, "px"]
+    px_5m_ago = float(base.iloc[-1]) if not base.empty else None
+    drop_5m = (latest / px_5m_ago - 1.0) if (px_5m_ago is not None and px_5m_ago > 0) else None
+
+    level = "NORMAL"
+    reasons: list[str] = []
+    if low_drop_prev <= -abs(float(alert_drop_pct)):
+        level = "ALERT"
+        reasons.append(f"day low vs prev close {low_drop_prev:.2%} <= -{abs(float(alert_drop_pct)):.2%}")
+    if drop_5m is not None and drop_5m <= -abs(float(alert_5m_drop_pct)):
+        level = "ALERT"
+        reasons.append(f"5m drop {drop_5m:.2%} <= -{abs(float(alert_5m_drop_pct)):.2%}")
+    if level != "ALERT":
+        if low_drop_prev <= -abs(float(warn_drop_pct)):
+            level = "WARN"
+            reasons.append(f"day low vs prev close {low_drop_prev:.2%} <= -{abs(float(warn_drop_pct)):.2%}")
+        if drop_5m is not None and drop_5m <= -abs(float(warn_5m_drop_pct)):
+            level = "WARN"
+            reasons.append(f"5m drop {drop_5m:.2%} <= -{abs(float(warn_5m_drop_pct)):.2%}")
+
+    out.update(
+        {
+            "status": "OK",
+            "level": level,
+            "latest_price": latest,
+            "open_price": open_px,
+            "prev_close": prev_close,
+            "drop_vs_prev_close": drop_prev,
+            "low_drop_vs_prev_close": low_drop_prev,
+            "drop_vs_open": drop_open,
+            "drop_5m": drop_5m,
+            "action_hint": ("REDUCE_FAST" if level == "ALERT" else ("REDUCE_LIGHT" if level == "WARN" else "NONE")),
+            "reason": "; ".join(reasons) if reasons else "normal range",
+        }
+    )
+    return out
 
 
 def _upsert_df(engine: Engine, df: pd.DataFrame, table_name: str, key_cols: list[str], int_cols: set[str] | None = None) -> int:
@@ -153,6 +367,41 @@ def _upsert_summary_archive(engine: Engine, date_str: str, table_name: str, payl
             [(pd.to_datetime(date_str).date(), json.dumps(payload, ensure_ascii=False))],
         )
     return 1
+
+
+def _upsert_report_archive(
+    engine: Engine,
+    date_str: str,
+    table_name: str,
+    report_md: str,
+    report_path: str,
+) -> int:
+    q_table = _quote(table_name)
+    with engine.begin() as conn:
+        conn.exec_driver_sql(
+            f"CREATE TABLE IF NOT EXISTS {q_table} ("
+            "`date` DATE NOT NULL PRIMARY KEY,"
+            "`report_md` LONGTEXT NULL,"
+            "`report_path` VARCHAR(255) NULL,"
+            "`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+            ")"
+        )
+        conn.exec_driver_sql(
+            f"INSERT INTO {q_table} (`date`,`report_md`,`report_path`) VALUES (%s,%s,%s) "
+            "ON DUPLICATE KEY UPDATE `report_md`=VALUES(`report_md`), `report_path`=VALUES(`report_path`)",
+            [(pd.to_datetime(date_str).date(), report_md, report_path)],
+        )
+    return 1
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def _load_allocation_with_history(primary_csv: Path) -> pd.DataFrame:
@@ -402,6 +651,28 @@ def _make_120d_plot(
     return p1, p2
 
 
+def _is_intraday_snapshot(trade_date: str, market_tz: str = "America/New_York", close_hhmm: str = "16:00") -> bool:
+    try:
+        tz = ZoneInfo(market_tz)
+    except Exception:
+        tz = ZoneInfo("America/New_York")
+    now_local = datetime.now(tz)
+    trade_dt = pd.to_datetime(trade_date, errors="coerce")
+    if pd.isna(trade_dt):
+        return False
+    if trade_dt.date() != now_local.date():
+        return False
+    if now_local.weekday() >= 5:
+        return False
+    hh, mm = (close_hhmm.split(":") + ["00"])[:2]
+    try:
+        close_minutes = int(hh) * 60 + int(mm)
+    except Exception:
+        close_minutes = 16 * 60
+    now_minutes = now_local.hour * 60 + now_local.minute
+    return now_minutes < close_minutes
+
+
 def main() -> None:
     _setup_cn_font()
     engine = _create_engine()
@@ -425,6 +696,26 @@ def main() -> None:
     p.add_argument("--health-table", default="v31_ops_monitor_health_checks")
     p.add_argument("--episodes-table", default="v31_ops_monitor_episodes")
     p.add_argument("--summary-archive-table", default="v31_ops_monitor_summary_archive")
+    p.add_argument("--report-archive-table", default="v31_ops_monitor_report_archive")
+    p.add_argument("--artifact-registry-table", default="v31_output_artifact_registry_daily")
+    p.add_argument("--market-tz", default="America/New_York")
+    p.add_argument("--market-close-hhmm", default="16:00", help="Market close cutoff in HH:MM local market time.")
+    p.add_argument(
+        "--intraday-policy",
+        default="mark",
+        choices=["mark", "skip", "allow"],
+        help="When trade_date is today and before market close: mark=generate intraday-labeled report; skip=do not generate report files; allow=generate normal report.",
+    )
+    p.add_argument("--intraday-dir", default="data/intraday")
+    p.add_argument("--intraday-ts-col", default="datetime")
+    p.add_argument("--intraday-price-col", default="close")
+    p.add_argument("--intraday-ref-daily-table", default="spy")
+    p.add_argument("--intraday-ref-date-col", default="date")
+    p.add_argument("--intraday-ref-close-col", default="close")
+    p.add_argument("--intraday-warn-drop-pct", type=float, default=0.015)
+    p.add_argument("--intraday-alert-drop-pct", type=float, default=0.025)
+    p.add_argument("--intraday-warn-5m-drop-pct", type=float, default=0.008)
+    p.add_argument("--intraday-alert-5m-drop-pct", type=float, default=0.012)
     p.add_argument("--skip-db-upsert", action="store_true")
     p.add_argument("--output-dir", default="output/v31_ops_monitor")
     args = p.parse_args()
@@ -507,6 +798,26 @@ def main() -> None:
     latest_row = alloc_sorted.iloc[-1].to_dict()
     trade_date = str(pd.to_datetime(latest_row["date"]).date())
     date_tag = trade_date.replace("-", "")
+    is_intraday = _is_intraday_snapshot(
+        trade_date=trade_date,
+        market_tz=str(args.market_tz),
+        close_hhmm=str(args.market_close_hhmm),
+    )
+    intraday_mode = bool(is_intraday and str(args.intraday_policy).lower() != "allow")
+    intraday_guard = _intraday_guardrail(
+        engine=engine,
+        trade_date=trade_date,
+        intraday_dir=str(args.intraday_dir).strip(),
+        intraday_ts_col=str(args.intraday_ts_col),
+        intraday_price_col=str(args.intraday_price_col),
+        ref_daily_table=str(args.intraday_ref_daily_table),
+        ref_daily_date_col=str(args.intraday_ref_date_col),
+        ref_daily_close_col=str(args.intraday_ref_close_col),
+        warn_drop_pct=float(args.intraday_warn_drop_pct),
+        alert_drop_pct=float(args.intraday_alert_drop_pct),
+        warn_5m_drop_pct=float(args.intraday_warn_5m_drop_pct),
+        alert_5m_drop_pct=float(args.intraday_alert_5m_drop_pct),
+    )
 
     p_struct = float(pd.to_numeric(latest_row.get("p_structural", 0.0), errors="coerce"))
     p_shock = float(pd.to_numeric(latest_row.get("p_shock", 0.0), errors="coerce"))
@@ -547,6 +858,13 @@ def main() -> None:
         "hard_gate_counts": hard_counts,
         "episode_stats": eps,
         "health_checks": health,
+        "report_context": {
+            "is_intraday_snapshot": bool(is_intraday),
+            "intraday_policy": str(args.intraday_policy),
+            "market_tz": str(args.market_tz),
+            "market_close_hhmm": str(args.market_close_hhmm),
+        },
+        "intraday_guardrail": intraday_guard,
     }
     if lf:
         out["lowfreq_recovery"] = lf
@@ -563,16 +881,20 @@ def main() -> None:
     health_ok = all(bool(v) for v in health.values())
     fail_reasons = []
     if not pass_dd:
-        fail_reasons.append(f"回撤压缩未达标（当前 {dd_reduction:.2%}，目标 >=40%）")
+        fail_reasons.append(f"目前看不出比基准更抗跌（当前回撤改善 {dd_reduction:.2%}，目标 >=40%）")
     if not pass_cagr:
-        fail_reasons.append(f"收益影响未达标（当前 {cagr_impact:.2%}，目标 <2%）")
+        fail_reasons.append(f"当前保护成本偏高（收益影响 {cagr_impact:.2%}，目标 <2%）")
     if not health["trigger_density_ok_2_to_8_per_year"]:
-        fail_reasons.append(f"触发次数偏离建议区间（当前 {eps['avg_triggers_per_year']:.2f} 次/年，建议 2~8）")
+        fail_reasons.append(f"风控触发次数偏少/偏多（当前年化 {eps['avg_triggers_per_year']:.2f} 次，建议 2~8 次）")
     if not health["episode_duration_ok_lt_15_days"]:
-        fail_reasons.append(f"单次触发持续偏长（当前 {eps['avg_episode_days']:.1f} 天，建议 <15）")
+        fail_reasons.append(f"每次防守持续时间偏长（当前 {eps['avg_episode_days']:.1f} 天，建议 <15 天）")
     if not health["full_liquidation_forbidden"]:
-        fail_reasons.append(f"出现全清仓（<=5%）天数：{eps['full_liquidation_days']} 天")
-    status_text = "系统整体正常，可继续按默认配置运行。" if health_ok else ("未通过项：" + "；".join(fail_reasons))
+        fail_reasons.append(f"出现过接近清仓的天数（<=5% 仓位）：{eps['full_liquidation_days']} 天")
+    status_text = "系统整体正常，可继续按默认配置运行。" if health_ok else ("当前提示：" + "；".join(fail_reasons))
+    if (not health_ok) and (intraday_mode or len(alloc_sorted) < 60):
+        status_text += "。另外，这次样本还短（盘中/近期窗口），这些统计结论仅供参考，收盘后和更长窗口再看更可靠。"
+    if intraday_mode:
+        status_text = "[盘中快照] " + status_text
     latest_alloc = float(pd.to_numeric(latest_row.get("final_allocation", 0.0), errors="coerce"))
     latest_action = str(latest_row.get("allocation_action", "NA"))
     latest_regime = str(latest_row.get("risk_regime", "NA"))
@@ -605,6 +927,10 @@ def main() -> None:
     v2_warn = str(v2.get("warning_level", "NA")).upper() if v2 else "NA"
     if v2_warn in {"WATCH", "ALERT", "SHORT"} and latest_action.upper() == "FULL_RISK_ON":
         signal_alerts.append(f"V2 预警层为 {v2_warn}，但执行层仍 FULL_RISK_ON。")
+    if intraday_guard.get("status") == "OK" and str(intraday_guard.get("level", "NA")).upper() in {"WARN", "ALERT"}:
+        signal_alerts.append(
+            f"盘中快控触发 {intraday_guard.get('level')}（{intraday_guard.get('reason', '')}），建议临时动作={intraday_guard.get('action_hint')}"
+        )
 
     data_alerts = list(dict.fromkeys(data_alerts))
     signal_alerts = list(dict.fromkeys(signal_alerts))
@@ -735,7 +1061,7 @@ def main() -> None:
         ]
 
     lines = [
-        "# 每日风险报告（易读版）",
+        "# 每日风险报告（易读版）" + (" [盘中快照]" if intraday_mode else ""),
         "",
         f"## 今日结论（{trade_date}）",
         f"- 冻结策略：{policy_name}",
@@ -748,6 +1074,36 @@ def main() -> None:
         f"- 仓位状态：{pos_state}",
         f"- 总结：{status_text}",
     ]
+    if intraday_mode:
+        lines.extend(
+            [
+                "",
+                "## 盘中声明",
+                f"- 当前为盘中快照（市场时区：{args.market_tz}，收盘时间：{args.market_close_hhmm}）。",
+                "- 数据与信号可能在收盘前继续变化，收盘后版本才作为正式日报。",
+            ]
+        )
+    lines.extend(
+        [
+            "",
+            "## 盘中快控补丁（分钟级）",
+            f"- 状态：{intraday_guard.get('status')} | 级别：{intraday_guard.get('level')} | 临时动作建议：{intraday_guard.get('action_hint')}",
+            f"- 触发依据：{intraday_guard.get('reason')}",
+        ]
+    )
+    if intraday_guard.get("status") == "OK":
+        d_prev = intraday_guard.get("drop_vs_prev_close")
+        d_low_prev = intraday_guard.get("low_drop_vs_prev_close")
+        d_open = intraday_guard.get("drop_vs_open")
+        d_5m = intraday_guard.get("drop_5m")
+        lines.extend(
+            [
+                f"- 最新价/昨收跌幅：{d_prev:.2%}" if isinstance(d_prev, float) else "- 最新价/昨收跌幅：NA",
+                f"- 日内最低/昨收跌幅：{d_low_prev:.2%}" if isinstance(d_low_prev, float) else "- 日内最低/昨收跌幅：NA",
+                f"- 最新价/今开跌幅：{d_open:.2%}" if isinstance(d_open, float) else "- 最新价/今开跌幅：NA",
+                f"- 最近5分钟跌幅：{d_5m:.2%}" if isinstance(d_5m, float) else "- 最近5分钟跌幅：NA",
+            ]
+        )
     if data_alerts or signal_alerts:
         lines.extend(
             [
@@ -785,14 +1141,15 @@ def main() -> None:
          if hardgate_none and early_inactive else "- 当前仍有部分门控在生效（硬门槛或 Early/Tactical 层）。"),
         "",
         "### 二、结构轨 & 冲击轨在干嘛？",
+        f"- 先说口径：以下判断只基于截至 {trade_date} 的日线数据，不等于盘中实时预警。",
         f"- 结构轨风险概率：今天 {p_struct:.3f}；近20日 {p_struct_20:.3f}。"
-        + (" 接近 0，说明没有慢性熊市结构风险。" if struct_near_zero else " 处于可关注区间，需继续观察趋势和中期环境。"),
-        ("- 说明：没有慢性熊市结构风险。"
+        + (" 数值较低，表示在“截至当日收盘”的口径下，暂未看到慢性熊市结构特征。" if struct_near_zero else " 处于可关注区间，需继续观察趋势和中期环境。"),
+        ("- 说明：收盘口径下暂未见中期结构恶化信号，不代表盘中不会突发走弱。"
          if struct_near_zero else "- 说明：中期结构风险仍需持续观察。"),
         "- 结构轨升高通常意味着：趋势走坏、中期环境恶化。",
         f"- 冲击轨风险概率：今天 {p_shock:.3f}；近20日 {p_shock_20:.3f}。"
-        + (" 当前较低，短期崩盘压力不强。" if shock_near_zero else " 不算低位，需关注突发波动风险。"),
-        ("- 说明：没有短期崩盘压力。"
+        + (" 数值较低，表示在“截至当日收盘”的口径下，短期冲击压力不高。" if shock_near_zero else " 不算低位，需关注突发波动风险。"),
+        ("- 说明：这是收盘口径结论；若盘中突然急跌，日线模型通常要到收盘后才会完整反映。"
          if shock_near_zero else "- 说明：短期冲击压力仍需跟踪。"),
         "- 冲击轨一般会在突发下跌前抬升。",
         "",
@@ -854,6 +1211,7 @@ def main() -> None:
         f"- 当前报告日期：{trade_date}",
         f"- allocation 数据覆盖区间：{data_start} ~ {data_end}",
         "- 若每天跑一次并更新到最新交易日，这份报告就是当天市场监控。",
+        "- 重要：若盘中出现急跌，这份日线报告可能滞后；收盘后重跑才是正式风险结论。",
     ])
     lines.extend(lf_lines)
     lines.extend(v2_lines)
@@ -861,17 +1219,51 @@ def main() -> None:
 
     report_text = "\n".join(lines)
     named_daily_report = out_dir / f"UTRBEV3_daily_report_{trade_date}.md"
-    (out_dir / "report.md").write_text(report_text, encoding="utf-8-sig")
-    (out_dir / f"report_{date_tag}.md").write_text(report_text, encoding="utf-8-sig")
-    (out_dir / "daily_report.md").write_text(report_text, encoding="utf-8-sig")
-    (out_dir / f"daily_report_{trade_date}.md").write_text(report_text, encoding="utf-8-sig")
-    named_daily_report.write_text(report_text, encoding="utf-8-sig")
+    skip_report_files = bool(is_intraday and str(args.intraday_policy).lower() == "skip")
+    if not skip_report_files:
+        (out_dir / "report.md").write_text(report_text, encoding="utf-8-sig")
+        (out_dir / f"report_{date_tag}.md").write_text(report_text, encoding="utf-8-sig")
+        (out_dir / "daily_report.md").write_text(report_text, encoding="utf-8-sig")
+        (out_dir / f"daily_report_{trade_date}.md").write_text(report_text, encoding="utf-8-sig")
+        named_daily_report.write_text(report_text, encoding="utf-8-sig")
     trend_png, trend_png_d = _make_120d_plot(alloc_sorted, bt_daily, out_dir, trade_date, status_text)
 
     snapshot_rows = 0
     health_rows = 0
     episode_rows = 0
     archive_rows = 0
+    report_archive_rows = 0
+    artifact_rows = 0
+
+    risk_summary_path = Path(str(args.risk_summary_json))
+    backtest_summary_path = Path(str(args.backtest_summary_json))
+    lowfreq_summary_path = Path(str(args.lowfreq_summary_json)) if str(args.lowfreq_summary_json).strip() else Path("")
+    us_latest_path = Path(str(args.unified_sentiment_json)) if str(args.unified_sentiment_json).strip() else Path("")
+    us_summary_path = Path(str(args.unified_sentiment_summary_json)) if str(args.unified_sentiment_summary_json).strip() else Path("")
+    risk_dir = risk_summary_path.parent if str(args.risk_summary_json).strip() else Path("")
+
+    required_artifacts: list[tuple[str, Path, str]] = [
+        ("ops_summary_json", out_dir / "summary.json", str(args.summary_archive_table)),
+        ("ops_chart_png", trend_png, ""),
+        ("ops_chart_png_dated", trend_png_d, ""),
+        ("v31_risk_latest_allocation", (risk_dir / "latest_allocation.json") if str(risk_dir) else Path(""), "v31_daily_allocation"),
+        ("v31_risk_summary", risk_summary_path, "v31_daily_allocation"),
+        ("v31_backtest_summary", backtest_summary_path, "v30_backtest_daily"),
+    ]
+    if str(us_latest_path):
+        required_artifacts.append(("v31_unified_sentiment_latest", us_latest_path, "sentiment_daily_unified"))
+    if str(us_summary_path):
+        required_artifacts.append(("v31_unified_sentiment_summary", us_summary_path, "sentiment_daily_unified"))
+    if str(lowfreq_summary_path):
+        required_artifacts.append(("v31_lowfreq_summary", lowfreq_summary_path, "v31_lowfreq_recovery_summary"))
+    if not skip_report_files:
+        required_artifacts.insert(1, ("ops_report_md", named_daily_report, str(args.report_archive_table)))
+    missing_required = [str(pth) for _, pth, _ in required_artifacts if not pth.exists()]
+    if missing_required and not bool(args.skip_db_upsert):
+        raise FileNotFoundError(f"required daily artifacts missing: {missing_required}")
+    if missing_required and bool(args.skip_db_upsert):
+        print(f"[WARN] Missing required daily artifacts (skip-db-upsert mode): {missing_required}")
+
     if not bool(args.skip_db_upsert):
         snapshot = pd.DataFrame(
             [
@@ -933,14 +1325,50 @@ def main() -> None:
             table_name=str(args.summary_archive_table),
             payload=out,
         )
+        if not skip_report_files:
+            report_archive_rows = _upsert_report_archive(
+                engine=engine,
+                date_str=trade_date,
+                table_name=str(args.report_archive_table),
+                report_md=report_text,
+                report_path=str(named_daily_report).replace("\\", "/"),
+            )
+
+        artifact_payload: list[dict] = []
+        for key, pth, source_table in required_artifacts:
+            stat = pth.stat() if pth.exists() else None
+            artifact_payload.append(
+                {
+                    "date": trade_date,
+                    "artifact_key": str(key),
+                    "artifact_path": str(pth).replace("\\", "/"),
+                    "source_table": str(source_table),
+                    "exists_flag": int(pth.exists()),
+                    "file_size_bytes": int(stat.st_size) if stat is not None else None,
+                    "file_mtime": datetime.fromtimestamp(stat.st_mtime).isoformat(timespec="seconds") if stat is not None else "",
+                    "file_sha256": _sha256_file(pth) if stat is not None else "",
+                }
+            )
+        artifact_df = pd.DataFrame(artifact_payload)
+        artifact_rows = _upsert_df(
+            engine,
+            artifact_df,
+            table_name=str(args.artifact_registry_table),
+            key_cols=["date", "artifact_key"],
+            int_cols={"exists_flag"},
+        )
 
     print(f"[OK] Wrote: {out_dir / 'summary.json'}")
-    print(f"[OK] Wrote: {out_dir / 'report.md'}")
-    print(f"[OK] Wrote: {out_dir / 'daily_report.md'}")
-    print(f"[OK] Wrote: {named_daily_report}")
+    if skip_report_files:
+        print(f"[OK] Skip report markdown generation (intraday policy=skip): trade_date={trade_date}")
+    else:
+        print(f"[OK] Wrote: {out_dir / 'report.md'}")
+        print(f"[OK] Wrote: {out_dir / 'daily_report.md'}")
+        print(f"[OK] Wrote: {named_daily_report}")
     print(f"[OK] Wrote: {out_dir / f'summary_{date_tag}.json'}")
-    print(f"[OK] Wrote: {out_dir / f'report_{date_tag}.md'}")
-    print(f"[OK] Wrote: {out_dir / f'daily_report_{trade_date}.md'}")
+    if not skip_report_files:
+        print(f"[OK] Wrote: {out_dir / f'report_{date_tag}.md'}")
+        print(f"[OK] Wrote: {out_dir / f'daily_report_{trade_date}.md'}")
     print(f"[OK] Wrote: {trend_png}")
     print(f"[OK] Wrote: {trend_png_d}")
     if not bool(args.skip_db_upsert):
@@ -948,6 +1376,8 @@ def main() -> None:
         print(f"[OK] DB upsert rows: {health_rows} -> table `{args.health_table}`")
         print(f"[OK] DB upsert rows: {episode_rows} -> table `{args.episodes_table}`")
         print(f"[OK] DB upsert rows: {archive_rows} -> table `{args.summary_archive_table}`")
+        print(f"[OK] DB upsert rows: {report_archive_rows} -> table `{args.report_archive_table}`")
+        print(f"[OK] DB upsert rows: {artifact_rows} -> table `{args.artifact_registry_table}`")
 
 
 if __name__ == "__main__":

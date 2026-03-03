@@ -1,0 +1,55 @@
+﻿{
+  "freq": "W-FRI",
+  "window": {
+    "start": "2006-02-24",
+    "end": "2026-02-20",
+    "rows": 1044
+  },
+  "thresholds": {
+    "drawdown_threshold": 0.12,
+    "max_horizon": 52,
+    "recovery_target": 1.0
+  },
+  "latest_state": {
+    "drawdown_now": 0.0,
+    "in_major_drawdown": false,
+    "rss": 0.9295881807536683,
+    "rsts": 1.086327887180609,
+    "persistence_adjustment": 0.0,
+    "gate": "NORMAL",
+    "action_hint": "ADD",
+    "short_term_confirmation": "VETO_SHORT_TERM_WARNING"
+  },
+  "events": [
+    {
+      "start_date": "2025-04-04",
+      "trough_date": "2025-04-04",
+      "end_date": "2025-06-27",
+      "drawdown_depth": -0.1687714509895738,
+      "event_len": 4,
+      "recovery_len": 13,
+      "recovered_target": true,
+      "a_recovery_amplitude": 1.086327887180609,
+      "b_recovery_speed": 0.16842648990143896,
+      "curve_r2": 0.9301076419816806,
+      "rss": 0.9295881807536683,
+      "rsts": 1.086327887180609,
+      "t50": 3.661414600809248
+    }
+  ],
+  "latest_event": {
+    "start_date": "2025-04-04",
+    "trough_date": "2025-04-04",
+    "end_date": "2025-06-27",
+    "drawdown_depth": -0.1687714509895738,
+    "event_len": 4,
+    "recovery_len": 13,
+    "recovered_target": true,
+    "a_recovery_amplitude": 1.086327887180609,
+    "b_recovery_speed": 0.16842648990143896,
+    "curve_r2": 0.9301076419816806,
+    "rss": 0.9295881807536683,
+    "rsts": 1.086327887180609,
+    "t50": 3.661414600809248
+  }
+}

@@ -1,0 +1,44 @@
+{
+    "policy":  {
+                   "mode":  "frontier_constrained",
+                   "cagr_impact_cap":  0.03,
+                   "dd_reduction_floor":  0.25,
+                   "lambdas":  [
+                                   0.5,
+                                   0.6,
+                                   0.7
+                               ],
+                   "default_lambda":  0.7
+               },
+    "feasible_count":  14,
+    "choices":  [
+                    {
+                        "lambda":  0.5,
+                        "run":  "v31_backtest_eval_step4_allocscan_48",
+                        "cagr_impact":  0.026234277870818,
+                        "dd_reduction":  0.289948564210718,
+                        "efficiency":  0.276831425275309
+                    },
+                    {
+                        "lambda":  0.6,
+                        "run":  "v31_backtest_eval_step4_allocscan_48",
+                        "cagr_impact":  0.026234277870818,
+                        "dd_reduction":  0.289948564210718,
+                        "efficiency":  0.27420799748822722
+                    },
+                    {
+                        "lambda":  0.7,
+                        "run":  "v31_backtest_eval_step4_allocscan_48",
+                        "cagr_impact":  0.026234277870818,
+                        "dd_reduction":  0.289948564210718,
+                        "efficiency":  0.27158456970114542
+                    }
+                ],
+    "selected_default":  {
+                             "lambda":  0.7,
+                             "run":  "v31_backtest_eval_step4_allocscan_48",
+                             "cagr_impact":  0.026234277870818,
+                             "dd_reduction":  0.289948564210718,
+                             "efficiency":  0.27158456970114542
+                         }
+}

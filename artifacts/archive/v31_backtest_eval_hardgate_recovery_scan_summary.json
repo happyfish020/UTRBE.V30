@@ -1,0 +1,1082 @@
+[
+    {
+        "id":  26,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.040786262104359317,
+        "dd_reduction":  0.56479498199471667,
+        "score":  0.028786262104359316
+    },
+    {
+        "id":  77,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.041084952005851605,
+        "dd_reduction":  0.56479498199472256,
+        "score":  0.029084952005851605
+    },
+    {
+        "id":  104,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.041932440916907288,
+        "dd_reduction":  0.56479498199472022,
+        "score":  0.029932440916907287
+    },
+    {
+        "id":  25,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.042109161853425947,
+        "dd_reduction":  0.56479498199471845,
+        "score":  0.030109161853425947
+    },
+    {
+        "id":  50,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.042173605084287136,
+        "dd_reduction":  0.56479498199471845,
+        "score":  0.030173605084287135
+    },
+    {
+        "id":  53,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.04255642319019759,
+        "dd_reduction":  0.564794981994719,
+        "score":  0.03055642319019759
+    },
+    {
+        "id":  24,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.042973968466254231,
+        "dd_reduction":  0.56923379633163484,
+        "score":  0.030973968466254231
+    },
+    {
+        "id":  76,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.043085331177127317,
+        "dd_reduction":  0.56006541545412847,
+        "score":  0.031085331177127317
+    },
+    {
+        "id":  49,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.0435059300892926,
+        "dd_reduction":  0.564794981994722,
+        "score":  0.0315059300892926
+    },
+    {
+        "id":  103,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.044046563739021494,
+        "dd_reduction":  0.55466818651017569,
+        "score":  0.0320465637390215
+    },
+    {
+        "id":  80,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.044507619005010213,
+        "dd_reduction":  0.56479498199471667,
+        "score":  0.032507619005010216
+    },
+    {
+        "id":  101,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.04486598923173335,
+        "dd_reduction":  0.56479498199472022,
+        "score":  0.032865989231733353
+    },
+    {
+        "id":  107,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.044921901870900172,
+        "dd_reduction":  0.56479498199471845,
+        "score":  0.032921901870900175
+    },
+    {
+        "id":  52,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.044980715548168071,
+        "dd_reduction":  0.56126815880882308,
+        "score":  0.032980715548168074
+    },
+    {
+        "id":  75,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.04509921907625758,
+        "dd_reduction":  0.5442580721241389,
+        "score":  0.033099219076257583
+    },
+    {
+        "id":  48,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.045254436723562989,
+        "dd_reduction":  0.55740581957573077,
+        "score":  0.033254436723562986
+    },
+    {
+        "id":  23,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.045359074552611789,
+        "dd_reduction":  0.56479498199471667,
+        "score":  0.033359074552611792
+    },
+    {
+        "id":  22,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.045859021507630882,
+        "dd_reduction":  0.564794981994719,
+        "score":  0.033859021507630885
+    },
+    {
+        "id":  74,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.046173616351164792,
+        "dd_reduction":  0.56479498199471789,
+        "score":  0.034173616351164796
+    },
+    {
+        "id":  102,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.046583083055485863,
+        "dd_reduction":  0.53566960382062034,
+        "score":  0.034583083055485866
+    },
+    {
+        "id":  21,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.046720495328498091,
+        "dd_reduction":  0.56923379633163718,
+        "score":  0.034720495328498094
+    },
+    {
+        "id":  51,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.046727944485089434,
+        "dd_reduction":  0.54864526203658859,
+        "score":  0.034727944485089438
+    },
+    {
+        "id":  100,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.046974760582501274,
+        "dd_reduction":  0.564794981994719,
+        "score":  0.034974760582501277
+    },
+    {
+        "id":  47,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.047300680330747413,
+        "dd_reduction":  0.56479498199472078,
+        "score":  0.035300680330747417
+    },
+    {
+        "id":  79,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.04786480580754926,
+        "dd_reduction":  0.549117153784262,
+        "score":  0.035864805807549263
+    },
+    {
+        "id":  73,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.048165218475946014,
+        "dd_reduction":  0.56479498199471723,
+        "score":  0.036165218475946018
+    },
+    {
+        "id":  20,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.048247601871344914,
+        "dd_reduction":  0.56479498199472145,
+        "score":  0.036247601871344917
+    },
+    {
+        "id":  46,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.048627109844508354,
+        "dd_reduction":  0.56479498199471967,
+        "score":  0.036627109844508357
+    },
+    {
+        "id":  106,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.048665419895349782,
+        "dd_reduction":  0.54154339813704444,
+        "score":  0.036665419895349785
+    },
+    {
+        "id":  19,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.04874629903890626,
+        "dd_reduction":  0.56479498199471967,
+        "score":  0.036746299038906263
+    },
+    {
+        "id":  17,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.048788394967155917,
+        "dd_reduction":  0.58713714725970911,
+        "score":  0.036788394967155913
+    },
+    {
+        "id":  95,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.04948653661362834,
+        "dd_reduction":  0.58618385056493416,
+        "score":  0.037486536613628343
+    },
+    {
+        "id":  99,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.049502709153081748,
+        "dd_reduction":  0.54881819629188133,
+        "score":  0.037502709153081751
+    },
+    {
+        "id":  18,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.0496050825605483,
+        "dd_reduction":  0.56923379633163185,
+        "score":  0.0376050825605483
+    },
+    {
+        "id":  68,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.049707605552675505,
+        "dd_reduction":  0.58713714725971333,
+        "score":  0.037707605552675508
+    },
+    {
+        "id":  78,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.049871862234983411,
+        "dd_reduction":  0.53333330297525949,
+        "score":  0.037871862234983414
+    },
+    {
+        "id":  44,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.049952837869234434,
+        "dd_reduction":  0.58713714725971267,
+        "score":  0.037952837869234438
+    },
+    {
+        "id":  16,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.050066493307889148,
+        "dd_reduction":  0.58713714725971444,
+        "score":  0.038066493307889152
+    },
+    {
+        "id":  72,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.050168778483206777,
+        "dd_reduction":  0.555228476369462,
+        "score":  0.038168778483206781
+    },
+    {
+        "id":  45,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.050366925379851768,
+        "dd_reduction":  0.56620092763456209,
+        "score":  0.038366925379851771
+    },
+    {
+        "id":  15,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.05075017327311282,
+        "dd_reduction":  0.5899033206526122,
+        "score":  0.038750173273112823
+    },
+    {
+        "id":  41,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.0509164879539894,
+        "dd_reduction":  0.58713714725971622,
+        "score":  0.0389164879539894
+    },
+    {
+        "id":  105,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.4,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.051193945348861458,
+        "dd_reduction":  0.522578752566975,
+        "score":  0.039193945348861461
+    },
+    {
+        "id":  67,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.051630776569223658,
+        "dd_reduction":  0.57409120860805063,
+        "score":  0.039630776569223661
+    },
+    {
+        "id":  94,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.05170646703575299,
+        "dd_reduction":  0.567966472740818,
+        "score":  0.039706467035752993
+    },
+    {
+        "id":  71,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.051770303375899829,
+        "dd_reduction":  0.58713714725971444,
+        "score":  0.039770303375899832
+    },
+    {
+        "id":  40,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.052049704351245341,
+        "dd_reduction":  0.58713714725971444,
+        "score":  0.040049704351245344
+    },
+    {
+        "id":  43,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.052172024033605879,
+        "dd_reduction":  0.57891427495270731,
+        "score":  0.040172024033605883
+    },
+    {
+        "id":  98,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.052768320974233118,
+        "dd_reduction":  0.58618385056493238,
+        "score":  0.040768320974233122
+    },
+    {
+        "id":  39,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.05369360752833896,
+        "dd_reduction":  0.5750450945264397,
+        "score":  0.041693607528338963
+    },
+    {
+        "id":  66,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.053747341685647987,
+        "dd_reduction":  0.55825333313366876,
+        "score":  0.04174734168564799
+    },
+    {
+        "id":  42,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.0538166957000672,
+        "dd_reduction":  0.56625771437269234,
+        "score":  0.0418166957000672
+    },
+    {
+        "id":  92,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.053875430780068623,
+        "dd_reduction":  0.58713714725971156,
+        "score":  0.041875430780068626
+    },
+    {
+        "id":  93,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.05417624992171155,
+        "dd_reduction":  0.54893390253294194,
+        "score":  0.042176249921711553
+    },
+    {
+        "id":  14,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.054990131797398645,
+        "dd_reduction":  0.58713714725971333,
+        "score":  0.042990131797398648
+    },
+    {
+        "id":  70,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.055043517417805,
+        "dd_reduction":  0.56311752560394734,
+        "score":  0.043043517417805
+    },
+    {
+        "id":  65,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.055174230459488216,
+        "dd_reduction":  0.58713714725971444,
+        "score":  0.043174230459488219
+    },
+    {
+        "id":  13,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.055450843788906745,
+        "dd_reduction":  0.58713714725971089,
+        "score":  0.043450843788906748
+    },
+    {
+        "id":  91,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.056086898981836157,
+        "dd_reduction":  0.58117766792889947,
+        "score":  0.044086898981836153
+    },
+    {
+        "id":  12,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.056130795704971925,
+        "dd_reduction":  0.5915997738005262,
+        "score":  0.044130795704971928
+    },
+    {
+        "id":  38,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.056309958414778594,
+        "dd_reduction":  0.58713714725971333,
+        "score":  0.0443099584147786
+    },
+    {
+        "id":  97,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.056604622828162032,
+        "dd_reduction":  0.55481312148827988,
+        "score":  0.044604622828162035
+    },
+    {
+        "id":  11,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.056998149908376483,
+        "dd_reduction":  0.58713714725971267,
+        "score":  0.044998149908376486
+    },
+    {
+        "id":  64,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.057088268539583931,
+        "dd_reduction":  0.58511060778829116,
+        "score":  0.045088268539583934
+    },
+    {
+        "id":  69,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.057155268390780778,
+        "dd_reduction":  0.54730317077863322,
+        "score":  0.045155268390780781
+    },
+    {
+        "id":  86,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.057196609684629474,
+        "dd_reduction":  0.59534882208069873,
+        "score":  0.045196609684629477
+    },
+    {
+        "id":  35,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.057393888301112472,
+        "dd_reduction":  0.60773627522945894,
+        "score":  0.045393888301112476
+    },
+    {
+        "id":  37,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.057437859720729678,
+        "dd_reduction":  0.58713714725971211,
+        "score":  0.045437859720729681
+    },
+    {
+        "id":  10,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.057458054538550574,
+        "dd_reduction":  0.58713714725970978,
+        "score":  0.045458054538550577
+    },
+    {
+        "id":  8,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.05747293761287775,
+        "dd_reduction":  0.60773627522945539,
+        "score":  0.045472937612877753
+    },
+    {
+        "id":  9,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.058136282706322984,
+        "dd_reduction":  0.59159977380052442,
+        "score":  0.046136282706322987
+    },
+    {
+        "id":  59,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.058371552435583229,
+        "dd_reduction":  0.59914103038499311,
+        "score":  0.046371552435583233
+    },
+    {
+        "id":  90,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.058545136407461389,
+        "dd_reduction":  0.56211109709254015,
+        "score":  0.046545136407461385
+    },
+    {
+        "id":  7,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.058710395332206122,
+        "dd_reduction":  0.60773627522946017,
+        "score":  0.046710395332206125
+    },
+    {
+        "id":  96,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.059065995339495414,
+        "dd_reduction":  0.53581452426986842,
+        "score":  0.047065995339495417
+    },
+    {
+        "id":  36,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.059073106794365504,
+        "dd_reduction":  0.58386709917191848,
+        "score":  0.047073106794365507
+    },
+    {
+        "id":  62,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.059091376766233772,
+        "dd_reduction":  0.59914103038498834,
+        "score":  0.047091376766233775
+    },
+    {
+        "id":  63,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.35,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.059193304071623043,
+        "dd_reduction":  0.569249195659446,
+        "score":  0.047193304071623046
+    },
+    {
+        "id":  6,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.059325311713499973,
+        "dd_reduction":  0.60340715469249717,
+        "score":  0.047325311713499976
+    },
+    {
+        "id":  34,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.059464234562790486,
+        "dd_reduction":  0.5924048232907585,
+        "score":  0.047464234562790489
+    },
+    {
+        "id":  85,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.059520425685366751,
+        "dd_reduction":  0.57709749533303489,
+        "score":  0.047520425685366754
+    },
+    {
+        "id":  58,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.060218372715071578,
+        "dd_reduction":  0.58394778903571254,
+        "score":  0.048218372715071581
+    },
+    {
+        "id":  32,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.060278458054248363,
+        "dd_reduction":  0.60773627522945362,
+        "score":  0.048278458054248366
+    },
+    {
+        "id":  89,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.06055495696939972,
+        "dd_reduction":  0.59534882208070228,
+        "score":  0.048554956969399723
+    },
+    {
+        "id":  33,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.060895956065973422,
+        "dd_reduction":  0.57972538874141166,
+        "score":  0.048895956065973425
+    },
+    {
+        "id":  31,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.061268754301607053,
+        "dd_reduction":  0.60122661152369927,
+        "score":  0.049268754301607057
+    },
+    {
+        "id":  84,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.061923806826577943,
+        "dd_reduction":  0.558047212468108,
+        "score":  0.049923806826577946
+    },
+    {
+        "id":  61,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.0622812409284641,
+        "dd_reduction":  0.57295803291673042,
+        "score":  0.0502812409284641
+    },
+    {
+        "id":  57,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.062435749007035517,
+        "dd_reduction":  0.56809291848830767,
+        "score":  0.050435749007035513
+    },
+    {
+        "id":  30,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.062697277069357238,
+        "dd_reduction":  0.58853213053530806,
+        "score":  0.050697277069357241
+    },
+    {
+        "id":  83,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.062924601992345286,
+        "dd_reduction":  0.60773627522945717,
+        "score":  0.050924601992345289
+    },
+    {
+        "id":  56,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.064209868852372676,
+        "dd_reduction":  0.60773627522945362,
+        "score":  0.052209868852372679
+    },
+    {
+        "id":  88,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.064482598458079909,
+        "dd_reduction":  0.56392679289325254,
+        "score":  0.052482598458079913
+    },
+    {
+        "id":  60,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.0644960672211814,
+        "dd_reduction":  0.55712669099002032,
+        "score":  0.0524960672211814
+    },
+    {
+        "id":  5,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.064541573449858225,
+        "dd_reduction":  0.60773627522945717,
+        "score":  0.052541573449858228
+    },
+    {
+        "id":  4,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.064968046099439958,
+        "dd_reduction":  0.60773627522945894,
+        "score":  0.052968046099439961
+    },
+    {
+        "id":  29,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.065134940801801156,
+        "dd_reduction":  0.60773627522945606,
+        "score":  0.053134940801801159
+    },
+    {
+        "id":  82,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.065236779089772767,
+        "dd_reduction":  0.59032606709393576,
+        "score":  0.053236779089772771
+    },
+    {
+        "id":  3,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.6,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.065579069162909454,
+        "dd_reduction":  0.61003894716649265,
+        "score":  0.053579069162909457
+    },
+    {
+        "id":  2,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  4,
+        "cagr_impact":  0.065927376933331727,
+        "dd_reduction":  0.60773627522945606,
+        "score":  0.05392737693333173
+    },
+    {
+        "id":  55,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.066047251423171582,
+        "dd_reduction":  0.5949832871602615,
+        "score":  0.054047251423171586
+    },
+    {
+        "id":  28,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.066121020406709086,
+        "dd_reduction":  0.60773627522945484,
+        "score":  0.054121020406709089
+    },
+    {
+        "id":  1,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  3,
+        "cagr_impact":  0.066353329468441524,
+        "dd_reduction":  0.60773627522945306,
+        "score":  0.054353329468441527
+    },
+    {
+        "id":  87,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.65,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.066877630506558372,
+        "dd_reduction":  0.54491048976861423,
+        "score":  0.054877630506558375
+    },
+    {
+        "id":  0,
+        "recovery_step":  0.06,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.066963079852266461,
+        "dd_reduction":  0.61222116909141078,
+        "score":  0.054963079852266464
+    },
+    {
+        "id":  27,
+        "recovery_step":  0.08,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.067542522879633138,
+        "dd_reduction":  0.59737354123068453,
+        "score":  0.055542522879633141
+    },
+    {
+        "id":  81,
+        "recovery_step":  0.12,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.067626011277987619,
+        "dd_reduction":  0.57124177709283053,
+        "score":  0.055626011277987622
+    },
+    {
+        "id":  54,
+        "recovery_step":  0.1,
+        "recovery_start_cap":  0.3,
+        "recovery_vol_q":  0.55,
+        "recovery_min_days":  2,
+        "cagr_impact":  0.068251831482715408,
+        "dd_reduction":  0.57910487215130446,
+        "score":  0.056251831482715411
+    }
+]

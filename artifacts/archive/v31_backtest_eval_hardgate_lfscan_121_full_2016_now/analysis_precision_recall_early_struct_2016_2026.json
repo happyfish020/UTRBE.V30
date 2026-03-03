@@ -1,0 +1,102 @@
+{
+  "assumption": "early_struct treated as p_structural",
+  "window": {
+    "start": "2016-01-04",
+    "end": "2026-03-02",
+    "rows": 2554
+  },
+  "signal_thresholds": {
+    "vol_high_q75_threshold": 0.011299916620607149,
+    "breadth_bad_q75_threshold": 0.3751590940884263,
+    "mom_down_threshold": 0.0,
+    "early_struct_threshold": 0.7
+  },
+  "freq_2017_2021": {
+    "2017": {
+      "rows": 251,
+      "vol_high_ratio": 0.0,
+      "mom_down_ratio": 0.32270916334661354,
+      "breadth_bad_ratio": 0.1593625498007968,
+      "early_struct_gt_07_ratio": 0.0,
+      "early_struct_gt_07_days": 0
+    },
+    "2021": {
+      "rows": 252,
+      "vol_high_ratio": 0.07142857142857142,
+      "mom_down_ratio": 0.34523809523809523,
+      "breadth_bad_ratio": 0.30158730158730157,
+      "early_struct_gt_07_ratio": 0.0,
+      "early_struct_gt_07_days": 0
+    }
+  },
+  "early_struct_gt_07_vs_future30d_m10dd": {
+    "confusion_matrix": {
+      "TP": 13,
+      "FP": 170,
+      "FN": 136,
+      "TN": 2235
+    },
+    "precision": 0.07103825136612021,
+    "recall": 0.087248322147651,
+    "prob_event_given_signal": 0.07103825136612021,
+    "base_event_rate": 0.058339859044635865,
+    "lift_vs_base": 1.2176623757655773
+  },
+  "per_year_signal_precision": {
+    "2016": {
+      "signal_days": 2,
+      "event_days": 0,
+      "precision": 0.0
+    },
+    "2017": {
+      "signal_days": 0,
+      "event_days": 0,
+      "precision": null
+    },
+    "2018": {
+      "signal_days": 6,
+      "event_days": 27,
+      "precision": 0.0
+    },
+    "2019": {
+      "signal_days": 1,
+      "event_days": 0,
+      "precision": 0.0
+    },
+    "2020": {
+      "signal_days": 42,
+      "event_days": 40,
+      "precision": 0.11904761904761904
+    },
+    "2021": {
+      "signal_days": 0,
+      "event_days": 0,
+      "precision": null
+    },
+    "2022": {
+      "signal_days": 118,
+      "event_days": 52,
+      "precision": 0.06779661016949153
+    },
+    "2023": {
+      "signal_days": 7,
+      "event_days": 0,
+      "precision": 0.0
+    },
+    "2024": {
+      "signal_days": 0,
+      "event_days": 0,
+      "precision": null
+    },
+    "2025": {
+      "signal_days": 7,
+      "event_days": 30,
+      "precision": 0.0
+    },
+    "2026": {
+      "signal_days": 0,
+      "event_days": 0,
+      "precision": null
+    }
+  }
+}

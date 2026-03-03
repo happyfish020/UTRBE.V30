@@ -1,0 +1,1245 @@
+﻿{
+  "window": {
+    "start": "2016-01-04",
+    "end": "2026-03-02",
+    "rows": 2554
+  },
+  "policy": {
+    "name": "A_ma100_frozen",
+    "config_json": "config/v31_phase_d_A_ma100_frozen_20260302.json",
+    "tactical_gate_mode": "MA100",
+    "early_struct_gate_mode": "MA100",
+    "early_struct_top20_mult": 0.9,
+    "early_struct_top10_mult": 0.8,
+    "shock_risk_cut": 0.2,
+    "shock_high_cut": 0.4
+  },
+  "latest_market_snapshot": {
+    "trade_date": "2026-03-02",
+    "final_allocation": 1.0,
+    "allocation_action": "FULL_RISK_ON",
+    "risk_regime": "LOW",
+    "hard_gate_reason": "NONE",
+    "p_structural_today": 0.0025498863555663,
+    "p_shock_today": 0.0329121163466154,
+    "p_structural_20d_avg": 0.00511358810575888,
+    "p_shock_20d_avg": 0.040633280465807546,
+    "early_score_today": 0.5577417326653968,
+    "early_struct_level_today": 0,
+    "early_struct_multiplier_today": 1.0,
+    "early_score_20d_avg": 0.46529170547387827,
+    "effective_risk_regime": "LOW",
+    "effective_risk_regime_note": ""
+  },
+  "metrics": {
+    "cagr_impact": 0.023687976515736286,
+    "dd_reduction": 0.47074057774805766
+  },
+  "reference": {
+    "cagr_impact": 0.01363814192818169,
+    "dd_reduction": 0.40131054938622435
+  },
+  "drift_vs_reference": {
+    "cagr_impact_delta_vs_reference": 0.010049834587554596,
+    "dd_reduction_delta_vs_reference": 0.06943002836183332
+  },
+  "hard_gate_counts": {
+    "NONE": 1934,
+    "BREADTH_CRISIS": 306,
+    "TREND_CAP": 211,
+    "CREDIT_HIGH": 103
+  },
+  "episode_stats": {
+    "episodes": [
+      {
+        "start_date": "2016-01-19",
+        "end_date": "2016-01-21",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 39
+      },
+      {
+        "start_date": "2016-01-22",
+        "end_date": "2016-02-12",
+        "days": 16,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.2204999999999999,
+        "recovery_days_to_95pct": 23
+      },
+      {
+        "start_date": "2016-02-16",
+        "end_date": "2016-02-17",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 21
+      },
+      {
+        "start_date": "2016-04-11",
+        "end_date": "2016-04-12",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-06-16",
+        "end_date": "2016-06-17",
+        "days": 2,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.405,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-06-24",
+        "end_date": "2016-06-29",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.315,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-08-30",
+        "end_date": "2016-08-31",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2016-09-01",
+        "end_date": "2016-09-06",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-09-09",
+        "end_date": "2016-09-12",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 4
+      },
+      {
+        "start_date": "2016-10-04",
+        "end_date": "2016-10-05",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 11
+      },
+      {
+        "start_date": "2016-10-11",
+        "end_date": "2016-10-20",
+        "days": 8,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-10-24",
+        "end_date": "2016-11-09",
+        "days": 13,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-11-14",
+        "end_date": "2016-11-15",
+        "days": 2,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.45,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-11-28",
+        "end_date": "2016-11-29",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2016-12-14",
+        "end_date": "2016-12-19",
+        "days": 4,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 4
+      },
+      {
+        "start_date": "2016-12-20",
+        "end_date": "2016-12-23",
+        "days": 4,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 5
+      },
+      {
+        "start_date": "2016-12-27",
+        "end_date": "2017-01-03",
+        "days": 5,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-01-19",
+        "end_date": "2017-01-27",
+        "days": 7,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.75,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2017-03-10",
+        "end_date": "2017-03-16",
+        "days": 5,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.45,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-03-20",
+        "end_date": "2017-03-28",
+        "days": 7,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-04-19",
+        "end_date": "2017-04-20",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-07-10",
+        "end_date": "2017-07-11",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-08-09",
+        "end_date": "2017-08-15",
+        "days": 5,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-08-17",
+        "end_date": "2017-08-22",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-11-06",
+        "end_date": "2017-11-07",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-11-09",
+        "end_date": "2017-11-16",
+        "days": 6,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.324,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2017-11-22",
+        "end_date": "2017-11-27",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-11-29",
+        "end_date": "2017-11-30",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2017-12-06",
+        "end_date": "2017-12-07",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2017-12-13",
+        "end_date": "2017-12-14",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2018-01-29",
+        "end_date": "2018-01-30",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2018-02-06",
+        "end_date": "2018-02-07",
+        "days": 2,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.315,
+        "recovery_days_to_95pct": 21
+      },
+      {
+        "start_date": "2018-02-08",
+        "end_date": "2018-02-15",
+        "days": 6,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.1764,
+        "recovery_days_to_95pct": 15
+      },
+      {
+        "start_date": "2018-02-27",
+        "end_date": "2018-02-28",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 7
+      },
+      {
+        "start_date": "2018-03-20",
+        "end_date": "2018-03-22",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 52
+      },
+      {
+        "start_date": "2018-03-23",
+        "end_date": "2018-03-26",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 50
+      },
+      {
+        "start_date": "2018-03-27",
+        "end_date": "2018-03-28",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 48
+      },
+      {
+        "start_date": "2018-04-02",
+        "end_date": "2018-04-04",
+        "days": 3,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.6400000000000001,
+        "recovery_days_to_95pct": 44
+      },
+      {
+        "start_date": "2018-04-05",
+        "end_date": "2018-04-10",
+        "days": 4,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.6400000000000001,
+        "recovery_days_to_95pct": 40
+      },
+      {
+        "start_date": "2018-04-11",
+        "end_date": "2018-04-12",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 38
+      },
+      {
+        "start_date": "2018-05-29",
+        "end_date": "2018-05-30",
+        "days": 2,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 5
+      },
+      {
+        "start_date": "2018-06-29",
+        "end_date": "2018-07-06",
+        "days": 5,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2018-07-11",
+        "end_date": "2018-07-12",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2018-08-15",
+        "end_date": "2018-08-21",
+        "days": 5,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2018-08-23",
+        "end_date": "2018-08-27",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2018-09-10",
+        "end_date": "2018-09-11",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2018-09-12",
+        "end_date": "2018-09-13",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2018-10-11",
+        "end_date": "2018-11-08",
+        "days": 21,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.2016,
+        "recovery_days_to_95pct": 85
+      },
+      {
+        "start_date": "2018-11-12",
+        "end_date": "2018-11-28",
+        "days": 12,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 72
+      },
+      {
+        "start_date": "2018-12-06",
+        "end_date": "2019-01-14",
+        "days": 26,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.1764,
+        "recovery_days_to_95pct": 42
+      },
+      {
+        "start_date": "2019-02-04",
+        "end_date": "2019-02-05",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 27
+      },
+      {
+        "start_date": "2019-04-22",
+        "end_date": "2019-04-23",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2019-04-24",
+        "end_date": "2019-04-25",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2019-04-26",
+        "end_date": "2019-04-30",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2019-05-01",
+        "end_date": "2019-05-03",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2019-05-07",
+        "end_date": "2019-05-08",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 21
+      },
+      {
+        "start_date": "2019-05-13",
+        "end_date": "2019-06-07",
+        "days": 19,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.2268,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2019-06-10",
+        "end_date": "2019-06-12",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2019-08-05",
+        "end_date": "2019-08-08",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.315,
+        "recovery_days_to_95pct": 18
+      },
+      {
+        "start_date": "2019-09-09",
+        "end_date": "2019-09-10",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2019-10-02",
+        "end_date": "2019-10-07",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2019-10-08",
+        "end_date": "2019-10-10",
+        "days": 3,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2019-12-24",
+        "end_date": "2019-12-26",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2020-01-27",
+        "end_date": "2020-01-29",
+        "days": 3,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 4
+      },
+      {
+        "start_date": "2020-01-30",
+        "end_date": "2020-02-04",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2020-02-27",
+        "end_date": "2020-04-06",
+        "days": 28,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.084,
+        "recovery_days_to_95pct": 73
+      },
+      {
+        "start_date": "2020-09-09",
+        "end_date": "2020-09-10",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 21
+      },
+      {
+        "start_date": "2020-09-23",
+        "end_date": "2020-09-25",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 10
+      },
+      {
+        "start_date": "2020-10-28",
+        "end_date": "2020-10-29",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 5
+      },
+      {
+        "start_date": "2020-11-25",
+        "end_date": "2020-11-27",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2020-12-17",
+        "end_date": "2020-12-18",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-03-02",
+        "end_date": "2021-03-04",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-03-08",
+        "end_date": "2021-03-09",
+        "days": 2,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.7200000000000001,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-03-15",
+        "end_date": "2021-03-16",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-03-24",
+        "end_date": "2021-03-26",
+        "days": 3,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.7200000000000001,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-03-30",
+        "end_date": "2021-04-08",
+        "days": 7,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-04-13",
+        "end_date": "2021-04-14",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2021-04-15",
+        "end_date": "2021-04-16",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-05-03",
+        "end_date": "2021-05-04",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-05-14",
+        "end_date": "2021-05-18",
+        "days": 3,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2021-05-19",
+        "end_date": "2021-05-20",
+        "days": 2,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.75,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-06-03",
+        "end_date": "2021-06-04",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-06-17",
+        "end_date": "2021-06-18",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-07-16",
+        "end_date": "2021-07-23",
+        "days": 6,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-07-29",
+        "end_date": "2021-07-30",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 4
+      },
+      {
+        "start_date": "2021-08-02",
+        "end_date": "2021-08-05",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.45,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2021-08-06",
+        "end_date": "2021-08-09",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-08-18",
+        "end_date": "2021-08-20",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-08-27",
+        "end_date": "2021-08-30",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-09-16",
+        "end_date": "2021-09-17",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 21
+      },
+      {
+        "start_date": "2021-09-21",
+        "end_date": "2021-10-15",
+        "days": 19,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-11-11",
+        "end_date": "2021-11-12",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2021-11-19",
+        "end_date": "2021-11-22",
+        "days": 2,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.45,
+        "recovery_days_to_95pct": 24
+      },
+      {
+        "start_date": "2021-11-23",
+        "end_date": "2021-12-14",
+        "days": 15,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 9
+      },
+      {
+        "start_date": "2021-12-16",
+        "end_date": "2021-12-28",
+        "days": 8,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2022-01-05",
+        "end_date": "2022-01-11",
+        "days": 5,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 314
+      },
+      {
+        "start_date": "2022-01-12",
+        "end_date": "2022-03-22",
+        "days": 48,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.1764,
+        "recovery_days_to_95pct": 266
+      },
+      {
+        "start_date": "2022-04-21",
+        "end_date": "2022-06-08",
+        "days": 34,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.1764,
+        "recovery_days_to_95pct": 212
+      },
+      {
+        "start_date": "2022-06-09",
+        "end_date": "2022-07-06",
+        "days": 18,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.0945,
+        "recovery_days_to_95pct": 194
+      },
+      {
+        "start_date": "2022-07-14",
+        "end_date": "2022-07-15",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 187
+      },
+      {
+        "start_date": "2022-07-25",
+        "end_date": "2022-07-26",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 180
+      },
+      {
+        "start_date": "2022-09-01",
+        "end_date": "2022-10-24",
+        "days": 37,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.19845,
+        "recovery_days_to_95pct": 117
+      },
+      {
+        "start_date": "2022-11-23",
+        "end_date": "2022-11-28",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 93
+      },
+      {
+        "start_date": "2022-11-29",
+        "end_date": "2022-11-30",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 91
+      },
+      {
+        "start_date": "2023-02-22",
+        "end_date": "2023-02-23",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 34
+      },
+      {
+        "start_date": "2023-02-28",
+        "end_date": "2023-03-02",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 29
+      },
+      {
+        "start_date": "2023-03-07",
+        "end_date": "2023-03-14",
+        "days": 6,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 21
+      },
+      {
+        "start_date": "2023-03-15",
+        "end_date": "2023-03-20",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 17
+      },
+      {
+        "start_date": "2023-03-21",
+        "end_date": "2023-03-22",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 15
+      },
+      {
+        "start_date": "2023-03-28",
+        "end_date": "2023-03-29",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 10
+      },
+      {
+        "start_date": "2023-05-11",
+        "end_date": "2023-05-12",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2023-05-30",
+        "end_date": "2023-06-02",
+        "days": 4,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2023-06-28",
+        "end_date": "2023-06-29",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 7
+      },
+      {
+        "start_date": "2023-06-30",
+        "end_date": "2023-07-11",
+        "days": 7,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2023-07-12",
+        "end_date": "2023-07-13",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2023-07-27",
+        "end_date": "2023-07-28",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2023-08-15",
+        "end_date": "2023-09-14",
+        "days": 22,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2023-09-21",
+        "end_date": "2023-11-15",
+        "days": 40,
+        "major_reason": "TREND_CAP",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2023-11-28",
+        "end_date": "2023-11-29",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-02-13",
+        "end_date": "2024-02-14",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-04-16",
+        "end_date": "2024-04-19",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 5
+      },
+      {
+        "start_date": "2024-04-25",
+        "end_date": "2024-04-26",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-04-30",
+        "end_date": "2024-05-01",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2024-05-17",
+        "end_date": "2024-05-20",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-06-04",
+        "end_date": "2024-06-05",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-06-07",
+        "end_date": "2024-06-10",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-08-01",
+        "end_date": "2024-08-14",
+        "days": 10,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-09-12",
+        "end_date": "2024-09-13",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-10-18",
+        "end_date": "2024-10-21",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-10-24",
+        "end_date": "2024-10-25",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-11-18",
+        "end_date": "2024-11-19",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2024-12-09",
+        "end_date": "2024-12-10",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2024-12-18",
+        "end_date": "2024-12-23",
+        "days": 4,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.2268,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2024-12-30",
+        "end_date": "2025-01-03",
+        "days": 4,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 7
+      },
+      {
+        "start_date": "2025-01-08",
+        "end_date": "2025-01-10",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 3
+      },
+      {
+        "start_date": "2025-02-21",
+        "end_date": "2025-02-24",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 58
+      },
+      {
+        "start_date": "2025-02-25",
+        "end_date": "2025-02-26",
+        "days": 2,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 56
+      },
+      {
+        "start_date": "2025-02-28",
+        "end_date": "2025-03-05",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 51
+      },
+      {
+        "start_date": "2025-03-06",
+        "end_date": "2025-03-19",
+        "days": 10,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.315,
+        "recovery_days_to_95pct": 41
+      },
+      {
+        "start_date": "2025-04-03",
+        "end_date": "2025-04-10",
+        "days": 6,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.1764,
+        "recovery_days_to_95pct": 25
+      },
+      {
+        "start_date": "2025-06-06",
+        "end_date": "2025-06-09",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2025-07-08",
+        "end_date": "2025-07-09",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2025-08-04",
+        "end_date": "2025-08-06",
+        "days": 3,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      },
+      {
+        "start_date": "2025-10-10",
+        "end_date": "2025-10-15",
+        "days": 4,
+        "major_reason": "CREDIT_HIGH",
+        "min_allocation": 0.36,
+        "recovery_days_to_95pct": 2
+      },
+      {
+        "start_date": "2026-01-29",
+        "end_date": "2026-01-30",
+        "days": 2,
+        "major_reason": "BREADTH_CRISIS",
+        "min_allocation": 0.3,
+        "recovery_days_to_95pct": 1
+      }
+    ],
+    "avg_triggers_per_year": 13.181818181818182,
+    "avg_episode_days": 5.275862068965517,
+    "avg_recovery_days": 20.76551724137931,
+    "full_liquidation_days": 0,
+    "full_liquidation_episode_ratio": 0.0,
+    "annual_trigger_counts": {
+      "2016": 17,
+      "2017": 13,
+      "2018": 20,
+      "2019": 13,
+      "2020": 8,
+      "2021": 24,
+      "2022": 9,
+      "2023": 15,
+      "2024": 15,
+      "2025": 10,
+      "2026": 1
+    }
+  },
+  "health_checks": {
+    "gate_dd_reduction_ge_40pct": true,
+    "gate_cagr_impact_lt_2pct": false,
+    "trigger_density_ok_2_to_8_per_year": false,
+    "episode_duration_ok_lt_15_days": true,
+    "full_liquidation_forbidden": true
+  },
+  "alerts": {
+    "data_quality": [],
+    "signal_conflicts": []
+  }
+}

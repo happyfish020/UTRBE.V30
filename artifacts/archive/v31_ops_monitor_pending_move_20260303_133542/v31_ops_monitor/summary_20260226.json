@@ -1,0 +1,134 @@
+﻿{
+  "window": {
+    "start": "2026-02-26",
+    "end": "2026-02-26",
+    "rows": 1
+  },
+  "latest_market_snapshot": {
+    "trade_date": "2026-02-26",
+    "final_allocation": 1.0,
+    "allocation_action": "FULL_RISK_ON",
+    "risk_regime": "LOW",
+    "hard_gate_reason": "NONE",
+    "p_structural_today": 0.0022943513471022554,
+    "p_shock_today": 0.041229084861214425,
+    "p_structural_20d_avg": 0.0022943513471022554,
+    "p_shock_20d_avg": 0.041229084861214425
+  },
+  "metrics": {
+    "cagr_impact": 0.0,
+    "dd_reduction": 0.0
+  },
+  "reference": {
+    "cagr_impact": 0.01363814192818169,
+    "dd_reduction": 0.40131054938622435
+  },
+  "drift_vs_reference": {
+    "cagr_impact_delta_vs_reference": -0.01363814192818169,
+    "dd_reduction_delta_vs_reference": -0.40131054938622435
+  },
+  "hard_gate_counts": {
+    "NONE": 1
+  },
+  "episode_stats": {
+    "episodes": [],
+    "avg_triggers_per_year": 0.0,
+    "avg_episode_days": 0.0,
+    "avg_recovery_days": 0.0,
+    "full_liquidation_days": 0,
+    "full_liquidation_episode_ratio": 0.0,
+    "annual_trigger_counts": {}
+  },
+  "health_checks": {
+    "gate_dd_reduction_ge_40pct": false,
+    "gate_cagr_impact_lt_2pct": true,
+    "trigger_density_ok_2_to_8_per_year": false,
+    "episode_duration_ok_lt_15_days": true,
+    "full_liquidation_forbidden": true
+  },
+  "lowfreq_recovery": {
+    "freq": "W-FRI",
+    "window": {
+      "start": "2026-02-27",
+      "end": "2026-02-27",
+      "rows": 1
+    },
+    "thresholds": {
+      "drawdown_threshold": 0.12,
+      "max_horizon": 52,
+      "recovery_target": 1.0
+    },
+    "latest_state": {
+      "drawdown_now": 0.0,
+      "in_major_drawdown": false,
+      "rss": 0.0,
+      "rsts": 0.0,
+      "persistence_adjustment": 0.0,
+      "gate": "ALERT",
+      "action_hint": "REDUCE",
+      "short_term_confirmation": "CONFIRM_SHORT_TERM_WARNING"
+    },
+    "events": [],
+    "latest_event": {}
+  },
+  "v2_signal_state": {
+    "date": "2026-02-26",
+    "p_lead5": 0.1034482758620689,
+    "p_lead10": 0.2043010752688172,
+    "srs": 0.0,
+    "srs_accel": 0.0,
+    "sentiment_signal": 0,
+    "vol20": 0.008164383184002949,
+    "vol60": 0.006704885193204317,
+    "hurst_100": 0.7766909609636539,
+    "drawdown_252": 0.008900203494402903,
+    "ret5d": 0.007041852883583166,
+    "ret20d": -0.006829563691485574,
+    "external_event": 0,
+    "is_trading_day": 1,
+    "lead5_slope_5d": NaN,
+    "trend_score": 0.18139733800337787,
+    "trend_score_slope_5d": 0.0,
+    "mode": "NORMAL",
+    "active_track": "LEAD5",
+    "switch_reason": "high_hurst",
+    "action": "HOLD_STRATEGIC",
+    "reference_prob": 0.1034482758620689,
+    "execution_signal": "NONE",
+    "warning_level": "NONE",
+    "signal_stage": "NONE",
+    "prewarning_type": "NONE",
+    "warning_source": "NONE",
+    "warning_sources": "NONE",
+    "portfolio_state": "NORMAL",
+    "cooldown_left": 0,
+    "normal_streak": 0,
+    "is_new_warning": 0,
+    "short_early_streak": 0,
+    "short_streak": 0,
+    "watch_streak": 0,
+    "short_trend_streak": 0.0,
+    "dd_expand_streak": 0.0
+  },
+  "unified_sentiment_state": {
+    "date": "2026-02-26T00:00:00",
+    "vix": 18.63,
+    "hy_oas": 2.98,
+    "fear_greed": 42.1730382293763,
+    "aaii_spread": null,
+    "wiki_views_total": 4899.0,
+    "gdelt_risk": 5034.0,
+    "z_vix": 0.0,
+    "z_hy_oas": 0.0,
+    "z_fear_greed_inv": -0.0,
+    "z_aaii_bear": -0.0,
+    "z_wiki_views": 0.0,
+    "z_gdelt_risk": 0.0,
+    "srs_v2": 0.0,
+    "srs_accel_v2": null,
+    "sentiment_signal_v2": 0,
+    "srs_plus": 0.0,
+    "srs_accel_plus": null,
+    "sentiment_signal_plus": 0
+  }
+}

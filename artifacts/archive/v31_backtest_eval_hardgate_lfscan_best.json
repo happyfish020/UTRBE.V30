@@ -1,0 +1,14 @@
+{
+    "id":  594,
+    "new_lows_thr":  0.6,
+    "ad_thr":  -0.9,
+    "ad_consec":  8,
+    "trend_cap":  0.65,
+    "crisis_alloc":  0.3,
+    "credit_q":  0.92,
+    "cagr_impact":  0.013502110755887696,
+    "dd_reduction":  0.39268417181008941,
+    "crisis_days":  4,
+    "trend_days":  3,
+    "score":  0
+}

@@ -8,6 +8,7 @@ import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import TextIO
+from zoneinfo import ZoneInfo
 
 
 
@@ -30,7 +31,11 @@ _RUNTIME_MODULES = (
 
 
 def _log_line(msg: str) -> None:
-    print(msg)
+    try:
+        print(msg)
+    except UnicodeEncodeError:
+        safe = str(msg).encode("utf-8", errors="replace").decode("utf-8", errors="replace")
+        print(safe.encode("ascii", errors="replace").decode("ascii", errors="replace"))
     if _ACTIVE_LOG_FH is not None:
         _ACTIVE_LOG_FH.write(f"{msg}\n")
         _ACTIVE_LOG_FH.flush()
@@ -121,20 +126,54 @@ def _last_trading_day(today: date | None = None) -> date:
     return d
 
 
+def _prev_business_day(d: date) -> date:
+    x = d - timedelta(days=1)
+    while x.weekday() >= 5:
+        x = x - timedelta(days=1)
+    return x
+
+
+def _auto_default_trade_day(market_tz: str = "America/New_York", close_hhmm: str = "16:00") -> date:
+    # No-arg mode behavior:
+    # - before market close: previous trading day
+    # - at/after market close: current trading day
+    try:
+        tz = ZoneInfo(market_tz)
+    except Exception:
+        tz = ZoneInfo("America/New_York")
+    now_local = datetime.now(tz)
+    hh, mm = (str(close_hhmm).split(":") + ["00"])[:2]
+    try:
+        close_minutes = int(hh) * 60 + int(mm)
+    except Exception:
+        close_minutes = 16 * 60
+
+    d = now_local.date()
+    if d.weekday() >= 5:
+        return _last_trading_day(d)
+
+    now_minutes = now_local.hour * 60 + now_local.minute
+    if now_minutes < close_minutes:
+        return _prev_business_day(d)
+    return d
+
+
 def main() -> None:
     global _ACTIVE_LOG_FH
     p = argparse.ArgumentParser(description="V31 production daily pipeline (DB -> V30 full chain).")
     p.add_argument("--start", default="2016-01-01", help="YYYY-MM-DD. If no args are provided, start=end=last trading day.")
     p.add_argument("--end", default="auto", help="YYYY-MM-DD or auto(last trading day).")
-    p.add_argument("--utrbe-output-dir", default=str((ROOT / "output" / "utrbe_prod_daily").resolve()))
-    p.add_argument("--utrbe-compare-output-dir", default=str((ROOT / "output" / "utrbe_compare_prod_daily").resolve()))
+    p.add_argument("--utrbe-output-dir", default=str((ROOT / "reports" / "utrbe_prod_daily").resolve()))
+    p.add_argument("--utrbe-compare-output-dir", default=str((ROOT / "reports" / "utrbe_compare_prod_daily").resolve()))
     p.add_argument("--market-features-table", default="market_features_daily")
     p.add_argument("--skip-utrbe-refresh", action="store_true")
     p.add_argument("--breadth-csv", default="../UTRBE/output/full_2006_2026.csv")
     p.add_argument("--tuning-json", default="config/v31_phase_d_A_ma100_frozen_20260302.json")
     p.add_argument("--policy-name", default="A_ma100_frozen")
     p.add_argument("--retrain-models", action="store_true")
-    p.add_argument("--shock-train-output-dir", default="output/v30_shock_train_step4")
+    p.add_argument("--artifact-dir", default="artifacts/v31_train_assets")
+    p.add_argument("--struct-train-output-dir", default="")
+    p.add_argument("--shock-train-output-dir", default="")
     args = p.parse_args()
 
     run_stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -147,11 +186,13 @@ def main() -> None:
             _log_line(f"[INFO] Run started: {datetime.now().isoformat(timespec='seconds')}")
 
             no_args_mode = len(sys.argv) == 1
-            last_td = _last_trading_day().isoformat()
+            last_td = _auto_default_trade_day().isoformat()
             if no_args_mode:
                 start = last_td
                 end = last_td
-                _log_line(f"[INFO] No CLI args detected. Using last trading day only: {last_td}")
+                _log_line(
+                    f"[INFO] No CLI args detected. Auto day rule (before 16:00 ET -> previous trading day, otherwise today). Using: {last_td}"
+                )
             else:
                 start = str(args.start)
                 end = last_td if str(args.end).lower() == "auto" else str(args.end)
@@ -160,6 +201,22 @@ def main() -> None:
 
             market_features_table = str(args.market_features_table).strip() or "market_features_daily"
             v2_latest_state_json = ""
+            artifact_dir = Path(str(args.artifact_dir)).resolve()
+            struct_train_dir = (
+                Path(str(args.struct_train_output_dir)).resolve()
+                if str(args.struct_train_output_dir).strip()
+                else (artifact_dir / "v30_structural_train").resolve()
+            )
+            shock_train_dir = (
+                Path(str(args.shock_train_output_dir)).resolve()
+                if str(args.shock_train_output_dir).strip()
+                else (artifact_dir / "v30_shock_train_step4").resolve()
+            )
+            features_csv = (artifact_dir / "v30_features_daily.csv").resolve()
+            features_meta_json = (artifact_dir / "v30_features_build_meta.json").resolve()
+            struct_train_dir.mkdir(parents=True, exist_ok=True)
+            shock_train_dir.mkdir(parents=True, exist_ok=True)
+            features_csv.parent.mkdir(parents=True, exist_ok=True)
 
             # Build unified sentiment first (DB -> features -> DB upsert), so v2 can read from DB.
             _run(
@@ -171,7 +228,7 @@ def main() -> None:
                     "--end",
                     end,
                     "--output-dir",
-                    "output/v31_unified_sentiment",
+                    "reports/v31_unified_sentiment",
                     "--table-name",
                     "sentiment_daily_unified",
                 ],
@@ -231,9 +288,9 @@ def main() -> None:
             "--breadth-value-col",
             "breadth",
             "--output-csv",
-            "output/v30_features_daily.csv",
+            str(features_csv),
             "--meta-json",
-            "output/v30_features_build_meta.json",
+            str(features_meta_json),
             "--table-name",
             "v30_features_daily",
             "--skip-csv-output",
@@ -257,19 +314,19 @@ def main() -> None:
                 cwd=ROOT,
             )
 
-            struct_model = ROOT / "output" / "v30_structural_train" / "structural_model.pkl"
-            shock_model = ROOT / args.shock_train_output_dir / "shock_model.pkl"
+            struct_model = struct_train_dir / "structural_model.pkl"
+            shock_model = shock_train_dir / "shock_model.pkl"
             if args.retrain_models or (not struct_model.exists()) or (not shock_model.exists()):
                 _run(
             [
                 utrbe_py,
                 "scripts/run_v30_structural_train.py",
                 "--features-csv",
-                "output/v30_features_daily.csv",
+                str(features_csv),
                 "--features-table",
                 "v30_features_daily",
                 "--output-dir",
-                "output/v30_structural_train",
+                str(struct_train_dir),
                 "--calibration",
                 "sigmoid",
                 "--test-years",
@@ -282,11 +339,11 @@ def main() -> None:
                 utrbe_py,
                 "scripts/run_v30_shock_train.py",
                 "--features-csv",
-                "output/v30_features_daily.csv",
+                str(features_csv),
                 "--features-table",
                 "v30_features_daily",
                 "--output-dir",
-                str(args.shock_train_output_dir),
+                str(shock_train_dir),
                 "--calibration",
                 "sigmoid",
                 "--test-years",
@@ -320,13 +377,13 @@ def main() -> None:
                     "--features-end",
                     end,
                     "--struct-model-pkl",
-                    "output/v30_structural_train/structural_model.pkl",
+                    str(struct_model),
                     "--shock-model-pkl",
-                    f"{args.shock_train_output_dir}/shock_model.pkl",
+                    str(shock_model),
                     "--struct-output-csv",
-                    "output/v30_structural_train/structural_full_predictions.csv",
+                    str((struct_train_dir / "structural_full_predictions.csv").resolve()),
                     "--shock-output-csv",
-                    f"{args.shock_train_output_dir}/shock_full_predictions.csv",
+                    str((shock_train_dir / "shock_full_predictions.csv").resolve()),
                     "--struct-output-table",
                     "v30_structural_full_predictions_daily",
                     "--shock-output-table",
@@ -349,7 +406,7 @@ def main() -> None:
                     "--tuning-json",
                     str(args.tuning_json),
                     "--output-dir",
-                    "output/v31_risk_aggregate_default_prod",
+                    "reports/v31_risk_aggregate_default_prod",
                     "--output-table",
                     "v31_daily_allocation",
                     "--data-start",
@@ -359,9 +416,9 @@ def main() -> None:
                     "--v2-latest-state-json",
                     str(v2_latest_state_json),
                     "--lowfreq-summary-json",
-                    "output/v31_lowfreq_recovery_weekly/summary.json",
+                    "reports/v31_lowfreq_recovery_weekly/summary.json",
                     "--unified-sentiment-summary-json",
-                    "output/v31_unified_sentiment/summary.json",
+                    "reports/v31_unified_sentiment/summary.json",
                     "--skip-csv-output",
                 ],
                 cwd=ROOT,
@@ -373,7 +430,7 @@ def main() -> None:
                     "--allocation-table",
                     "v31_daily_allocation",
                     "--output-dir",
-                    "output/v31_backtest_eval_default_prod",
+                    "reports/v31_backtest_eval_default_prod",
                     "--execution-lag-days",
                     "1",
                     "--transaction-cost-bps",
@@ -402,7 +459,7 @@ def main() -> None:
                     "--freq",
                     "weekly",
                     "--output-dir",
-                    "output/v31_lowfreq_recovery_weekly",
+                    "reports/v31_lowfreq_recovery_weekly",
                     "--summary-table",
                     "v31_lowfreq_recovery_summary",
                     "--events-table",
@@ -416,11 +473,11 @@ def main() -> None:
                     utrbe_py,
                     "scripts/run_v31_ops_monitor.py",
                     "--backtest-summary-json",
-                    "output/v31_backtest_eval_default_prod/summary.json",
+                    "reports/v31_backtest_eval_default_prod/summary.json",
                     "--backtest-daily-table",
                     "v30_backtest_daily",
                     "--risk-summary-json",
-                    "output/v31_risk_aggregate_default_prod/summary.json",
+                    "reports/v31_risk_aggregate_default_prod/summary.json",
                     "--allocation-table",
                     "v31_daily_allocation",
                     "--start-date",
@@ -428,30 +485,30 @@ def main() -> None:
                     "--end-date",
                     end,
                     "--reference-summary-json",
-                    "output/v31_backtest_eval_hardgate_gatepass/summary.json",
+                    "artifacts/baselines/v31_backtest_eval_hardgate_gatepass/summary.json",
                     "--lowfreq-summary-json",
-                    "output/v31_lowfreq_recovery_weekly/summary.json",
+                    "reports/v31_lowfreq_recovery_weekly/summary.json",
                     "--v2-latest-state-json",
                     str(v2_latest_state_json),
                     "--unified-sentiment-json",
-                    "output/v31_unified_sentiment/latest_unified_sentiment.json",
+                    "reports/v31_unified_sentiment/latest_unified_sentiment.json",
                     "--unified-sentiment-summary-json",
-                    "output/v31_unified_sentiment/summary.json",
+                    "reports/v31_unified_sentiment/summary.json",
                     "--policy-name",
                     str(args.policy_name),
                     "--policy-config-json",
                     str(args.tuning_json),
                     "--output-dir",
-                    "output/v31_ops_monitor",
+                    "reports/v31_ops_monitor",
                 ],
                 cwd=ROOT,
             )
 
             _log_line("[OK] V31 production daily pipeline completed.")
             _log_line("[OK] Outputs:")
-            _log_line(f"  - output/v31_ops_monitor/UTRBEV3_daily_report_{end}.md")
-            _log_line("  - output/v31_ops_monitor/strategy_120d.png")
-            _log_line("  - output/v31_ops_monitor/summary.json")
+            _log_line(f"  - reports/v31_ops_monitor/UTRBEV3_daily_report_{end}.md")
+            _log_line("  - reports/v31_ops_monitor/strategy_120d.png")
+            _log_line("  - reports/v31_ops_monitor/summary.json")
             _log_line(f"[OK] Log file: {log_path}")
         finally:
             _ACTIVE_LOG_FH = None

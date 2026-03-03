@@ -1,0 +1,214 @@
+﻿{
+  "window": {
+    "start": "2026-03-02",
+    "end": "2026-03-02",
+    "rows": 1
+  },
+  "policy": {
+    "name": "A_ma100_frozen",
+    "config_json": "config/v31_phase_d_A_ma100_frozen_20260302.json",
+    "tactical_gate_mode": "MA100",
+    "early_struct_gate_mode": "MA100",
+    "early_struct_top20_mult": 0.9,
+    "early_struct_top10_mult": 0.8,
+    "shock_risk_cut": 0.2,
+    "shock_high_cut": 0.4
+  },
+  "latest_market_snapshot": {
+    "trade_date": "2026-03-02",
+    "final_allocation": 0.6,
+    "allocation_action": "LIGHT_REDUCE",
+    "risk_regime": "LOW",
+    "hard_gate_reason": "NONE",
+    "p_structural_today": 0.0025107293474927717,
+    "p_shock_today": 0.0329121163466154,
+    "p_structural_20d_avg": 0.0025107293474927717,
+    "p_shock_20d_avg": 0.0329121163466154,
+    "early_score_today": 0.5,
+    "early_struct_level_today": 0,
+    "early_struct_multiplier_today": 1.0,
+    "early_score_20d_avg": 0.5,
+    "effective_risk_regime": "MEDIUM_GATED",
+    "effective_risk_regime_note": "（执行护栏）"
+  },
+  "metrics": {
+    "cagr_impact": 0.0,
+    "dd_reduction": 0.0
+  },
+  "reference": {
+    "cagr_impact": 0.01363814192818169,
+    "dd_reduction": 0.40131054938622435
+  },
+  "drift_vs_reference": {
+    "cagr_impact_delta_vs_reference": -0.01363814192818169,
+    "dd_reduction_delta_vs_reference": -0.40131054938622435
+  },
+  "hard_gate_counts": {
+    "NONE": 1
+  },
+  "episode_stats": {
+    "episodes": [],
+    "avg_triggers_per_year": 0.0,
+    "avg_episode_days": 0.0,
+    "avg_recovery_days": 0.0,
+    "full_liquidation_days": 0,
+    "full_liquidation_episode_ratio": 0.0,
+    "annual_trigger_counts": {}
+  },
+  "health_checks": {
+    "gate_dd_reduction_ge_40pct": false,
+    "gate_cagr_impact_lt_2pct": true,
+    "trigger_density_ok_2_to_8_per_year": false,
+    "episode_duration_ok_lt_15_days": true,
+    "full_liquidation_forbidden": true
+  },
+  "report_context": {
+    "is_intraday_snapshot": false,
+    "intraday_policy": "mark",
+    "market_tz": "America/New_York",
+    "market_close_hhmm": "16:00"
+  },
+  "intraday_guardrail": {
+    "enabled": true,
+    "status": "UNAVAILABLE",
+    "level": "NA",
+    "latest_price": null,
+    "open_price": null,
+    "prev_close": null,
+    "drop_vs_prev_close": null,
+    "low_drop_vs_prev_close": null,
+    "drop_vs_open": null,
+    "drop_5m": null,
+    "action_hint": "NONE",
+    "reason": "no intraday files found under: data/intraday"
+  },
+  "lowfreq_recovery": {
+    "freq": "W-FRI",
+    "window": {
+      "start": "2026-03-06",
+      "end": "2026-03-06",
+      "rows": 1
+    },
+    "thresholds": {
+      "drawdown_threshold": 0.12,
+      "max_horizon": 52,
+      "recovery_target": 1.0
+    },
+    "latest_state": {
+      "drawdown_now": 0.0,
+      "in_major_drawdown": false,
+      "rss": 0.0,
+      "rsts": 0.0,
+      "persistence_adjustment": 0.0,
+      "gate": "ALERT",
+      "action_hint": "REDUCE",
+      "short_term_confirmation": "CONFIRM_SHORT_TERM_WARNING"
+    },
+    "events": [],
+    "latest_event": {}
+  },
+  "v2_signal_state": {
+    "date": "2026-03-03",
+    "p_lead5": 0.1034482758620689,
+    "p_lead10": 0.2043010752688172,
+    "srs": 0.0,
+    "srs_accel": 0.0,
+    "sentiment_signal": 0,
+    "vol20": 0.007900382329174472,
+    "vol60": 0.006718498427698085,
+    "hurst_100": 0.7771729361246928,
+    "drawdown_252": 0.013098657751339449,
+    "ret5d": -0.001411174419986172,
+    "ret20d": -0.004568364364456512,
+    "external_event": 0,
+    "is_trading_day": 0,
+    "lead5_slope_5d": NaN,
+    "trend_score": 0.15950681434094582,
+    "trend_score_slope_5d": 0.0,
+    "mode": "NORMAL",
+    "active_track": "LEAD5",
+    "switch_reason": "high_hurst",
+    "action": "HOLD_STRATEGIC",
+    "reference_prob": 0.1034482758620689,
+    "execution_signal": "NONE",
+    "warning_level": "NONE",
+    "signal_stage": "NONE",
+    "prewarning_type": "NONE",
+    "warning_source": "NONE",
+    "warning_sources": "NONE",
+    "portfolio_state": "NORMAL",
+    "cooldown_left": 0,
+    "normal_streak": 0,
+    "is_new_warning": 0,
+    "short_early_streak": 0,
+    "short_streak": 0,
+    "watch_streak": 0,
+    "short_trend_streak": 0.0,
+    "dd_expand_streak": 0.0
+  },
+  "unified_sentiment_state": {
+    "date": "2026-03-02T00:00:00",
+    "vix": 21.44,
+    "hy_oas": 3.03,
+    "fear_greed": 33.6460317460318,
+    "aaii_spread": -2.4095999999999975,
+    "wiki_views_total": 3283.0,
+    "gdelt_risk": 7465.0,
+    "z_vix": 0.0,
+    "z_hy_oas": 0.0,
+    "z_fear_greed_inv": -0.0,
+    "z_aaii_bear": -0.0,
+    "z_wiki_views": 0.0,
+    "z_gdelt_risk": 0.0,
+    "srs_v2": 0.0,
+    "srs_accel_v2": null,
+    "sentiment_signal_v2": 0,
+    "srs_plus": 0.0,
+    "srs_accel_plus": null,
+    "sentiment_signal_plus": 0
+  },
+  "alerts": {
+    "data_quality": [
+      "aaii_spread 非当日更新（latest=2026-02-19）"
+    ],
+    "signal_conflicts": []
+  },
+  "unified_sentiment_freshness": {
+    "vix": {
+      "latest": "2026-03-02",
+      "rows": 41,
+      "stale_bdays": 0,
+      "is_stale": false
+    },
+    "hy_oas": {
+      "latest": "2026-03-02",
+      "rows": 43,
+      "stale_bdays": 0,
+      "is_stale": false
+    },
+    "fear_greed": {
+      "latest": "2026-03-02",
+      "rows": 39,
+      "stale_bdays": 0,
+      "is_stale": false
+    },
+    "aaii_spread": {
+      "latest": "2026-02-19",
+      "rows": 34,
+      "stale_bdays": 7,
+      "is_stale": true
+    },
+    "wiki_views_total": {
+      "latest": "2026-02-28",
+      "rows": 55,
+      "stale_bdays": 0,
+      "is_stale": false
+    },
+    "gdelt_risk": {
+      "latest": "2026-03-02",
+      "rows": 57,
+      "stale_bdays": 0,
+      "is_stale": false
+    }
+  }
+}

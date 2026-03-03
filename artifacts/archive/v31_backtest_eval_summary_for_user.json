@@ -1,0 +1,78 @@
+{
+  "v31_backtest_eval_recovery_accel": {
+    "window": {
+      "start": "2016-01-04",
+      "end": "2026-02-19",
+      "rows": 2547
+    },
+    "strategy": {
+      "cagr": 0.10306246966881472,
+      "max_drawdown": -0.1362998330926043,
+      "sharpe": 0.9840076906386828,
+      "calmar": 0.7561452375278583,
+      "win_rate": 0.5543776992540244
+    },
+    "benchmark": {
+      "cagr": 0.14779514887523582,
+      "max_drawdown": -0.3371726416016424,
+      "sharpe": 0.8586788906295463,
+      "calmar": 0.4383367172768738,
+      "win_rate": 0.5543776992540244
+    },
+    "triggers": {
+      "label1_ratio": 0.6497840596780526,
+      "trigger_count": 152,
+      "avg_triggers_per_year": 15.038869257950529,
+      "avg_duration_days": 10.888157894736842,
+      "max_duration_days": 349,
+      "trade_count": 863
+    },
+    "crisis_2020": {
+      "crash_day": "2020-03-16",
+      "crash_spy_ret1d": -0.1094238584381226,
+      "trigger_date": "2020-01-24",
+      "lead_trading_days": 35
+    },
+    "has_2008": false,
+    "year_2017_avg_alloc": 0.8271513944223107,
+    "year_2017_risk_on_ratio": 0.3904382470119522
+  },
+  "v31_backtest_eval_recovery_boost": {
+    "window": {
+      "start": "2016-01-04",
+      "end": "2026-02-19",
+      "rows": 2547
+    },
+    "strategy": {
+      "cagr": 0.12993126192698878,
+      "max_drawdown": -0.19564006174561444,
+      "sharpe": 1.000151702415755,
+      "calmar": 0.6641342308301607,
+      "win_rate": 0.5539850804868472
+    },
+    "benchmark": {
+      "cagr": 0.14779514887523582,
+      "max_drawdown": -0.3371726416016424,
+      "sharpe": 0.8586788906295463,
+      "calmar": 0.4383367172768738,
+      "win_rate": 0.5543776992540244
+    },
+    "triggers": {
+      "label1_ratio": 0.5068708284255987,
+      "trigger_count": 209,
+      "avg_triggers_per_year": 20.678445229681977,
+      "avg_duration_days": 6.177033492822966,
+      "max_duration_days": 312,
+      "trade_count": 836
+    },
+    "crisis_2020": {
+      "crash_day": "2020-03-16",
+      "crash_spy_ret1d": -0.1094238584381226,
+      "trigger_date": "2020-02-21",
+      "lead_trading_days": 16
+    },
+    "has_2008": false,
+    "year_2017_avg_alloc": 0.954581673306773,
+    "year_2017_risk_on_ratio": 0.1593625498007968
+  }
+}

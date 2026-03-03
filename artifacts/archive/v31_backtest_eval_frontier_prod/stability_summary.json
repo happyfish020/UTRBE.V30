@@ -1,0 +1,202 @@
+{
+  "overall": {
+    "baseline": {
+      "rows": 477,
+      "total_return": 0.27437414854472064,
+      "annualized_return": 0.13665477030382944,
+      "max_drawdown": -0.1402336090632359,
+      "vol_annualized": 0.11966587583222887,
+      "tail_risk_5pct_mean": -0.018867338100403405,
+      "cagr_impact": 0.06418912490838036,
+      "dd_reduction": 0.25229628380937347
+    },
+    "step3": {
+      "rows": 477,
+      "total_return": 0.3475095012990834,
+      "annualized_return": 0.17066305701591244,
+      "max_drawdown": -0.15168288358791016,
+      "vol_annualized": 0.14025085056311037,
+      "tail_risk_5pct_mean": -0.021145970157963406,
+      "cagr_impact": 0.030180838196297355,
+      "dd_reduction": 0.19125053901986777
+    },
+    "frontier_prod": {
+      "rows": 478,
+      "total_return": 0.35698755658546255,
+      "annualized_return": 0.17460961734139113,
+      "max_drawdown": -0.1331718343845667,
+      "vol_annualized": 0.129706832856732,
+      "tail_risk_5pct_mean": -0.019761337554295738,
+      "cagr_impact": 0.026234277870818667,
+      "dd_reduction": 0.2899485642107204
+    }
+  },
+  "yearly": {
+    "2024": {
+      "baseline": {
+        "rows": 224,
+        "total_return": 0.1505945230441732,
+        "annualized_return": 0.17094794892112208,
+        "max_drawdown": -0.07143629946559737,
+        "vol_annualized": 0.11555346636611005,
+        "tail_risk_5pct_mean": -0.01756788034235745,
+        "cagr_impact": 0.03829216648654432,
+        "dd_reduction": 0.15013795299546043
+      },
+      "step3": {
+        "rows": 224,
+        "total_return": 0.15769451949705804,
+        "annualized_return": 0.1790798690351203,
+        "max_drawdown": -0.07581524876010415,
+        "vol_annualized": 0.11785617910898065,
+        "tail_risk_5pct_mean": -0.017953528753617276,
+        "cagr_impact": 0.030160246372546107,
+        "dd_reduction": 0.09804254997208814
+      },
+      "frontier_prod": {
+        "rows": 225,
+        "total_return": 0.15769451949705804,
+        "annualized_return": 0.17821691844473309,
+        "max_drawdown": -0.07581524876010415,
+        "vol_annualized": 0.11759618699780529,
+        "tail_risk_5pct_mean": -0.017953528753617276,
+        "cagr_impact": 0.03102319696293332,
+        "dd_reduction": 0.09804254997208814
+      }
+    },
+    "2025": {
+      "baseline": {
+        "rows": 250,
+        "total_return": 0.09295487380455691,
+        "annualized_return": 0.09373232785544094,
+        "max_drawdown": -0.14023360906323612,
+        "vol_annualized": 0.12365199632732882,
+        "tail_risk_5pct_mean": -0.01965173007626227,
+        "cagr_impact": 0.08499555485549193,
+        "dd_reduction": 0.25229628380937275
+      },
+      "step3": {
+        "rows": 250,
+        "total_return": 0.14859108007371602,
+        "annualized_return": 0.14986475585407621,
+        "max_drawdown": -0.15168288358791016,
+        "vol_annualized": 0.15820084404132723,
+        "tail_risk_5pct_mean": -0.023277165203276138,
+        "cagr_impact": 0.028863126856856658,
+        "dd_reduction": 0.19125053901986827
+      },
+      "frontier_prod": {
+        "rows": 250,
+        "total_return": 0.15666999138965543,
+        "annualized_return": 0.1580175576984133,
+        "max_drawdown": -0.13317183438456592,
+        "vol_annualized": 0.14022783086892393,
+        "tail_risk_5pct_mean": -0.020847276497974538,
+        "cagr_impact": 0.02071032501251957,
+        "dd_reduction": 0.289948564210725
+      }
+    },
+    "2026": {
+      "baseline": {
+        "rows": 3,
+        "total_return": 0.013380211538155828,
+        "annualized_return": 2.054099888126151,
+        "max_drawdown": 0.0,
+        "vol_annualized": 0.03385749299657144,
+        "tail_risk_5pct_mean": 0.001426447713898,
+        "cagr_impact": 0.2977688463779171,
+        "dd_reduction": 0.0
+      },
+      "step3": {
+        "rows": 3,
+        "total_return": 0.013380211538155828,
+        "annualized_return": 2.054099888126151,
+        "max_drawdown": 0.0,
+        "vol_annualized": 0.03385749299657144,
+        "tail_risk_5pct_mean": 0.001426447713898,
+        "cagr_impact": 0.2977688463779171,
+        "dd_reduction": 0.0
+      },
+      "frontier_prod": {
+        "rows": 3,
+        "total_return": 0.013380211538155828,
+        "annualized_return": 2.054099888126151,
+        "max_drawdown": 0.0,
+        "vol_annualized": 0.03385749299657144,
+        "tail_risk_5pct_mean": 0.001426447713898,
+        "cagr_impact": 0.2977688463779171,
+        "dd_reduction": 0.0
+      }
+    }
+  },
+  "stress_subwindows": {
+    "q10_dd_threshold": -0.060436641689282825,
+    "q25_dd_threshold": -0.026379799995852493,
+    "metrics": {
+      "stress_q10": {
+        "baseline": {
+          "rows": 48,
+          "total_return": -0.07932813411379747,
+          "annualized_return": -0.35203644657991373,
+          "max_drawdown": -0.10528955440805166,
+          "vol_annualized": 0.16619809275297356,
+          "tail_risk_5pct_mean": -0.027077790676614064,
+          "cagr_impact": 0.1547827540465747,
+          "dd_reduction": 0.3106070757760157
+        },
+        "step3": {
+          "rows": 48,
+          "total_return": -0.03621284166104577,
+          "annualized_return": -0.17604980510186063,
+          "max_drawdown": -0.11758532854290304,
+          "vol_annualized": 0.2822351508107673,
+          "tail_risk_5pct_mean": -0.03811400969188853,
+          "cagr_impact": -0.021203887431478385,
+          "dd_reduction": 0.2300993774190493
+        },
+        "frontier_prod": {
+          "rows": 48,
+          "total_return": -0.029433796346536423,
+          "annualized_return": -0.14516535724448365,
+          "max_drawdown": -0.09833023974995181,
+          "vol_annualized": 0.2275425788649548,
+          "tail_risk_5pct_mean": -0.030744709966270368,
+          "cagr_impact": -0.05208833528885537,
+          "dd_reduction": 0.356173820831738
+        }
+      },
+      "stress_q25": {
+        "baseline": {
+          "rows": 120,
+          "total_return": -0.21611441952979127,
+          "annualized_return": -0.400304736153377,
+          "max_drawdown": -0.23983678431429623,
+          "vol_annualized": 0.16045084389270353,
+          "tail_risk_5pct_mean": -0.02641013901437585,
+          "cagr_impact": 0.06865582593659458,
+          "dd_reduction": 0.13997430645431885
+        },
+        "step3": {
+          "rows": 120,
+          "total_return": -0.1711278286512672,
+          "annualized_return": -0.3257454690973568,
+          "max_drawdown": -0.24533138177811598,
+          "vol_annualized": 0.21818692806724352,
+          "tail_risk_5pct_mean": -0.032412027106283804,
+          "cagr_impact": -0.005903441119425645,
+          "dd_reduction": 0.12027134467518094
+        },
+        "frontier_prod": {
+          "rows": 120,
+          "total_return": -0.16529774266092,
+          "annualized_return": -0.3157475914557015,
+          "max_drawdown": -0.22886382777754477,
+          "vol_annualized": 0.19097002200915922,
+          "tail_risk_5pct_mean": -0.028429926660040388,
+          "cagr_impact": -0.015901318761080918,
+          "dd_reduction": 0.1793220011073603
+        }
+      }
+    }
+  }
+}

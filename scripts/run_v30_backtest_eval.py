@@ -84,7 +84,9 @@ def fetch_spy_ret(start: pd.Timestamp, end: pd.Timestamp, spy_ret_csv: str) -> p
         sys.path.insert(0, str(utrbe_src))
     from utrbe.data.fetcher import DataFetcher
 
-    f = DataFetcher()
+    # Force UTRBE config root so sources.yaml is resolved from sibling UTRBE project.
+    utrbe_root = (PROJECT_ROOT.parent / 'UTRBE').resolve()
+    f = DataFetcher(config_dir=utrbe_root)
     s = pd.to_numeric(f.get_price('spy', start.date(), end.date()), errors='coerce')
     s.index = pd.to_datetime(s.index)
     r = s.pct_change().fillna(0.0)

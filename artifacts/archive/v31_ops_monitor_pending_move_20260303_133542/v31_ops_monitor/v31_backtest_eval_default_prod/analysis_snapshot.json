@@ -1,0 +1,338 @@
+{
+  "source_file": "d:\\LHJ\\PythonWS\\UTRBE.V30\\output\\v31_backtest_eval_default_prod\\v30_backtest_daily.csv",
+  "full_window": {
+    "start": "2006-02-21",
+    "end": "2025-02-21",
+    "rows": 4782
+  },
+  "ten_year_metrics": {
+    "strategy": {
+      "days": 2516,
+      "start": "2015-02-23",
+      "end": "2025-02-21",
+      "total_return": 0.12485474667443186,
+      "cagr": 0.011853802240404443,
+      "max_drawdown": -0.05654007945659367,
+      "sharpe": 0.3429802271190856,
+      "calmar": 0.2096530877623671,
+      "win_rate": 0.06001589825119237
+    },
+    "benchmark": {
+      "days": 2516,
+      "start": "2015-02-23",
+      "end": "2025-02-21",
+      "total_return": 0.21289401881227032,
+      "cagr": 0.019519676096097394,
+      "max_drawdown": -0.08405634740059875,
+      "sharpe": 0.4928351657266791,
+      "calmar": 0.23222132176490876,
+      "win_rate": 0.06001589825119237
+    }
+  },
+  "full_metrics": {
+    "strategy": {
+      "days": 4782,
+      "start": "2006-02-21",
+      "end": "2025-02-21",
+      "total_return": 0.0823890642791214,
+      "cagr": 0.004180822221753422,
+      "max_drawdown": -0.08744479214380285,
+      "sharpe": 0.17169099830632575,
+      "calmar": 0.0478109915897343,
+      "win_rate": 0.03157674613132581
+    },
+    "benchmark": {
+      "days": 4782,
+      "start": "2006-02-21",
+      "end": "2025-02-21",
+      "total_return": 0.21289401881227032,
+      "cagr": 0.010223029352175228,
+      "max_drawdown": -0.08405634740059875,
+      "sharpe": 0.3574324171292839,
+      "calmar": 0.12162114662743967,
+      "win_rate": 0.03157674613132581
+    }
+  },
+  "ten_year_trigger_stats": {
+    "label1_ratio": 0.5290143084260731,
+    "trigger_count": 200,
+    "avg_triggers_per_year": 20.031796502384736,
+    "avg_duration_days": 6.655,
+    "max_duration_days": 312,
+    "trade_count": 983
+  },
+  "crisis_2008": {
+    "year": 2008,
+    "crash_day": "2008-01-02",
+    "crash_spy_ret1d": 0.0,
+    "last_precrash_trigger_date": "2008-01-02",
+    "lead_trading_days": 0,
+    "timeline": [
+      {
+        "date": "2008-01-02",
+        "final_allocation": 0.7,
+        "applied_allocation": 0.8,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9927033049906188,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-03",
+        "final_allocation": 0.9,
+        "applied_allocation": 0.7,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9926834509245188,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-04",
+        "final_allocation": 0.7,
+        "applied_allocation": 0.9,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.992643743586482,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-07",
+        "final_allocation": 0.7,
+        "applied_allocation": 0.7,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9926040378367385,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-08",
+        "final_allocation": 0.7,
+        "applied_allocation": 0.7,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9926040378367385,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-09",
+        "final_allocation": 0.315,
+        "applied_allocation": 0.7,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9926040378367385,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-10",
+        "final_allocation": 0.8,
+        "applied_allocation": 0.315,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9925276073258248,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-11",
+        "final_allocation": 0.8,
+        "applied_allocation": 0.8,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9924313321479142,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-14",
+        "final_allocation": 0.9,
+        "applied_allocation": 0.8,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9924313321479142,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-15",
+        "final_allocation": 0.24,
+        "applied_allocation": 0.9,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9924114835212712,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-16",
+        "final_allocation": 0.504,
+        "applied_allocation": 0.24,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9922804852054464,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-17",
+        "final_allocation": 0.63,
+        "applied_allocation": 0.504,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9922280927958276,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-18",
+        "final_allocation": 0.63,
+        "applied_allocation": 0.63,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9922030886478892,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-22",
+        "final_allocation": 0.315,
+        "applied_allocation": 0.63,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9922030886478892,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-23",
+        "final_allocation": 0.36,
+        "applied_allocation": 0.315,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9921405798533044,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2008-01-24",
+        "final_allocation": 0.81,
+        "applied_allocation": 0.36,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9921316505880856,
+        "benchmark_nav": 1.0
+      }
+    ]
+  },
+  "crisis_2020": {
+    "year": 2020,
+    "crash_day": "2020-01-02",
+    "crash_spy_ret1d": 0.0,
+    "last_precrash_trigger_date": null,
+    "lead_trading_days": null,
+    "timeline": [
+      {
+        "date": "2020-01-02",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431771271143856,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-03",
+        "final_allocation": 0.8,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431771271143856,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-06",
+        "final_allocation": 1.0,
+        "applied_allocation": 0.8,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.943139400029301,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-07",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-08",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-09",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-10",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-13",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-14",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-15",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-16",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-17",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-21",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-22",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-23",
+        "final_allocation": 1.0,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      },
+      {
+        "date": "2020-01-24",
+        "final_allocation": 0.8,
+        "applied_allocation": 1.0,
+        "spy_ret1d": 0.0,
+        "strategy_nav": 0.9431016744532996,
+        "benchmark_nav": 1.0
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "windows": 66,
+  "period_start": "2016-01-04",
+  "period_end": "2026-03-02",
+  "strategy": {
+    "cagr_mean": 0.1298934140922152,
+    "cagr_std": 0.021938591888285574,
+    "sharpe_mean": 1.0076185646407265,
+    "sharpe_std": 0.16326787366712428,
+    "calmar_mean": 0.7761695278196675,
+    "calmar_std": 0.14003770026168927
+  },
+  "vs_benchmark": {
+    "cagr_impact_mean": 0.01449907754769918,
+    "dd_reduction_mean": 0.4604237103771615,
+    "sharpe_diff_mean": 0.21373378897646056,
+    "calmar_diff_mean": 0.30779752285627815,
+    "sharpe_win_rate": 1.0,
+    "calmar_win_rate": 1.0,
+    "dd_reduction_positive_rate": 1.0
+  }
+}
