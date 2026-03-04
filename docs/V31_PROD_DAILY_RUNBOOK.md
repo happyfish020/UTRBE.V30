@@ -1,7 +1,7 @@
 ﻿# V31 Production Daily Runbook
 
 Version: v1.5.2  
-Updated: 2026-02-25
+Updated: 2026-03-04
 
 ## Goal
 Run production daily process from DB close data to final V31 ops report with one command.
@@ -15,6 +15,10 @@ Run production daily process from DB close data to final V31 ops report with one
 ```bash
 python scripts/run_v31_prod_daily.py
 ```
+
+Default SQLite paths:
+- `--backtest-db-path data/backtest/v30_backtest.sqlite`
+- `--artifact-db-path data/backtest/v30_backtest.sqlite`
 
 Default behavior:
 1. If no CLI args are provided, run single-day only: `start=end=last trading day` (not natural day, avoid intraday incomplete bars).
@@ -32,6 +36,10 @@ No CSV dependency in runtime data path (default):
 - Upstream and intermediate data bus is DB tables.
 - CSV files are optional artifacts only when explicitly enabled.
 
+Storage split (current):
+- Production MySQL: production feed + ops monitor tables (`v2_*`, `v31_ops_*`, `v31_lowfreq_*`, etc.)
+- V30 SQLite: backtest/strategy core data and model/artifact store (`v30_*`, `v31_daily_allocation`, `v30_backtest_daily`, `v30_model_store`, `v30_artifact_file_store`)
+
 ## Dependency
 If you want `V2` signal-state block in V31 report, `latest_state.json` from UTRBE output is required.
 Unified sentiment layer is DB-first:
@@ -45,11 +53,15 @@ Market features are also DB-first:
 - Gray biotech overlay (new): `IBB`-derived fields are generated when source data exists and mapped to
   `ibb_risk_score` in V31 aggregation (`ibb_risk_weight`, default `0.05` in prod tuning).
 
-V30 feature/label persistence (DB-first):
-- `run_v30_build_features.py` upserts into `v30_features_daily`.
-- `run_v30_build_labels.py` upserts into:
+V30 feature/label persistence (SQLite-first):
+- `run_v30_build_features.py` reads production market features from MySQL (`market_features_daily`) and upserts into SQLite `v30_features_daily`.
+- `run_v30_build_labels.py` upserts into SQLite:
   - `v30_structural_labels_daily`
   - `v30_shock_labels_daily`
+
+V30 model storage:
+- Default runtime loads model bundles from SQLite `v30_model_store` (`v30_structural_model_prod`, `v30_shock_model_prod`).
+- File `pkl` fallback exists for backward compatibility, but file persistence is no longer the primary path.
 
 Low-frequency recovery auxiliary persistence (DB-first):
 - `run_v31_lowfreq_recovery.py` upserts into:
@@ -68,7 +80,7 @@ Unified sentiment artifact behavior:
 - `sentiment_daily_unified.csv` is optional via `--write-csv` (default off).
 
 ## Key Outputs
-- `output/logs/UTRBEV30_log_YYYY-MM-DD.log`
+- `logs/UTRBEV30_log_YYYY-MM-DD_HHMMSS.log`
 - `output/v31_ops_monitor/daily_report.md`
 - `output/v31_ops_monitor/daily_report_YYYY-MM-DD.md`
 - `output/v31_ops_monitor/UTRBEV3_daily_report_YYYY-MM-DD.md`
@@ -106,13 +118,13 @@ Check these fields in `output/v31_ops_monitor/summary.json`:
 If one-command run fails, run in order:
 1. `python scripts/run_v31_build_unified_sentiment.py --table-name sentiment_daily_unified`
 2. `python ../UTRBE/scripts/run_daily_pipeline.py --market-features-table market_features_daily --unified-sentiment-table sentiment_daily_unified ...`
-3. `python scripts/run_v30_build_features.py --input-table market_features_daily --table-name v30_features_daily ...`
-4. `python scripts/run_v30_build_labels.py --features-table v30_features_daily --struct-table v30_structural_labels_daily --shock-table v30_shock_labels_daily ...`
-5. `python scripts/run_v30_full_infer.py --features-table v30_features_daily --struct-output-table v30_structural_full_predictions_daily --shock-output-table v30_shock_full_predictions_daily ...`
-6. `python scripts/run_v30_risk_aggregate.py --features-table v30_features_daily --struct-pred-table v30_structural_full_predictions_daily --shock-pred-table v30_shock_full_predictions_daily --output-table v31_daily_allocation ...`
-7. `python scripts/run_v30_backtest_eval.py --allocation-table v31_daily_allocation --output-daily-table v30_backtest_daily ...`
+3. `python scripts/run_v30_build_features.py --input-table market_features_daily --input-table-source mysql --table-name v30_features_daily --db-path data/backtest/v30_backtest.sqlite ...`
+4. `python scripts/run_v30_build_labels.py --features-table v30_features_daily --struct-table v30_structural_labels_daily --shock-table v30_shock_labels_daily --db-path data/backtest/v30_backtest.sqlite ...`
+5. `python scripts/run_v30_full_infer.py --features-table v30_features_daily --artifact-db-path data/backtest/v30_backtest.sqlite --struct-model-key v30_structural_model_prod --shock-model-key v30_shock_model_prod --db-path data/backtest/v30_backtest.sqlite --struct-output-table v30_structural_full_predictions_daily --shock-output-table v30_shock_full_predictions_daily ...`
+6. `python scripts/run_v30_risk_aggregate.py --features-table v30_features_daily --struct-pred-table v30_structural_full_predictions_daily --shock-pred-table v30_shock_full_predictions_daily --db-path data/backtest/v30_backtest.sqlite --output-table v31_daily_allocation ...`
+7. `python scripts/run_v30_backtest_eval.py --allocation-table v31_daily_allocation --db-path data/backtest/v30_backtest.sqlite --output-daily-table v30_backtest_daily ...`
 8. `python scripts/run_v31_lowfreq_recovery.py --daily-table v30_backtest_daily ...`
-9. `python scripts/run_v31_ops_monitor.py --allocation-table v31_daily_allocation --backtest-daily-table v30_backtest_daily ...`
+9. `python scripts/run_v31_ops_monitor.py --allocation-csv output/v31_risk_aggregate_default_prod/daily_allocation.csv --backtest-daily-csv output/v31_backtest_eval_default_prod/v30_backtest_daily.csv --reference-summary-sqlite-key v31_backtest_eval_hardgate_gatepass/summary.json --artifact-db-path data/backtest/v30_backtest.sqlite ...`
 
 ## Gray Rollback Switch
 If you need to temporarily disable the cautious gray mode in V2 execution:
