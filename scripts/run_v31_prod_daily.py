@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -170,6 +170,8 @@ def main() -> None:
     p.add_argument("--breadth-csv", default="../UTRBE/output/full_2006_2026.csv")
     p.add_argument("--tuning-json", default="config/v31_phase_d_A_ma100_frozen_20260302.json")
     p.add_argument("--policy-name", default="A_ma100_frozen")
+    p.add_argument("--backtest-db-path", default="data/backtest/v30_backtest.sqlite")
+    p.add_argument("--artifact-db-path", default="data/backtest/v30_backtest.sqlite")
     p.add_argument("--retrain-models", action="store_true")
     p.add_argument("--artifact-dir", default="artifacts/v31_train_assets")
     p.add_argument("--struct-train-output-dir", default="")
@@ -200,6 +202,8 @@ def main() -> None:
             _preflight_runtime(utrbe_py)
 
             market_features_table = str(args.market_features_table).strip() or "market_features_daily"
+            backtest_db_path = str(args.backtest_db_path).strip() or "data/backtest/v30_backtest.sqlite"
+            artifact_db_path = str(args.artifact_db_path).strip() or backtest_db_path
             v2_latest_state_json = ""
             artifact_dir = Path(str(args.artifact_dir)).resolve()
             struct_train_dir = (
@@ -279,6 +283,8 @@ def main() -> None:
             "scripts/run_v30_build_features.py",
             "--input-table",
             market_features_table,
+            "--input-table-source",
+            "mysql",
             "--input-start",
             start,
             "--input-end",
@@ -293,6 +299,8 @@ def main() -> None:
             str(features_meta_json),
             "--table-name",
             "v30_features_daily",
+            "--db-path",
+            backtest_db_path,
             "--skip-csv-output",
         ],
                 cwd=ROOT,
@@ -307,6 +315,8 @@ def main() -> None:
             "v30_structural_labels_daily",
             "--shock-table",
             "v30_shock_labels_daily",
+            "--db-path",
+            backtest_db_path,
             "--shock-adaptive-drop",
             "--shock-use-stress-override",
             "--skip-csv-output",
@@ -316,17 +326,22 @@ def main() -> None:
 
             struct_model = struct_train_dir / "structural_model.pkl"
             shock_model = shock_train_dir / "shock_model.pkl"
-            if args.retrain_models or (not struct_model.exists()) or (not shock_model.exists()):
+            struct_model_key = "v30_structural_model_prod"
+            shock_model_key = "v30_shock_model_prod"
+            if args.retrain_models:
                 _run(
             [
                 utrbe_py,
                 "scripts/run_v30_structural_train.py",
-                "--features-csv",
-                str(features_csv),
                 "--features-table",
                 "v30_features_daily",
-                "--output-dir",
-                str(struct_train_dir),
+                "--db-path",
+                backtest_db_path,
+                "--artifact-db-path",
+                artifact_db_path,
+                "--model-key",
+                struct_model_key,
+                "--skip-file-output",
                 "--calibration",
                 "sigmoid",
                 "--test-years",
@@ -338,12 +353,15 @@ def main() -> None:
             [
                 utrbe_py,
                 "scripts/run_v30_shock_train.py",
-                "--features-csv",
-                str(features_csv),
                 "--features-table",
                 "v30_features_daily",
-                "--output-dir",
-                str(shock_train_dir),
+                "--db-path",
+                backtest_db_path,
+                "--artifact-db-path",
+                artifact_db_path,
+                "--model-key",
+                shock_model_key,
+                "--skip-file-output",
                 "--calibration",
                 "sigmoid",
                 "--test-years",
@@ -376,10 +394,14 @@ def main() -> None:
                     start,
                     "--features-end",
                     end,
-                    "--struct-model-pkl",
-                    str(struct_model),
-                    "--shock-model-pkl",
-                    str(shock_model),
+                    "--db-path",
+                    backtest_db_path,
+                    "--artifact-db-path",
+                    artifact_db_path,
+                    "--struct-model-key",
+                    struct_model_key,
+                    "--shock-model-key",
+                    shock_model_key,
                     "--struct-output-csv",
                     str((struct_train_dir / "structural_full_predictions.csv").resolve()),
                     "--shock-output-csv",
@@ -413,13 +435,14 @@ def main() -> None:
                     start,
                     "--data-end",
                     end,
+                    "--db-path",
+                    backtest_db_path,
                     "--v2-latest-state-json",
                     str(v2_latest_state_json),
                     "--lowfreq-summary-json",
                     "reports/v31_lowfreq_recovery_weekly/summary.json",
                     "--unified-sentiment-summary-json",
                     "reports/v31_unified_sentiment/summary.json",
-                    "--skip-csv-output",
                 ],
                 cwd=ROOT,
             )
@@ -437,11 +460,12 @@ def main() -> None:
                     "2",
                     "--output-daily-table",
                     "v30_backtest_daily",
+                    "--db-path",
+                    backtest_db_path,
                     "--data-start",
                     start,
                     "--data-end",
                     end,
-                    "--skip-csv-output",
                 ],
                 cwd=ROOT,
             )
@@ -450,8 +474,8 @@ def main() -> None:
                 [
                     utrbe_py,
                     "scripts/run_v31_lowfreq_recovery.py",
-                    "--daily-table",
-                    "v30_backtest_daily",
+                    "--daily-csv",
+                    "reports/v31_backtest_eval_default_prod/v30_backtest_daily.csv",
                     "--start-date",
                     start,
                     "--end-date",
@@ -474,18 +498,22 @@ def main() -> None:
                     "scripts/run_v31_ops_monitor.py",
                     "--backtest-summary-json",
                     "reports/v31_backtest_eval_default_prod/summary.json",
-                    "--backtest-daily-table",
-                    "v30_backtest_daily",
+                    "--backtest-daily-csv",
+                    "reports/v31_backtest_eval_default_prod/v30_backtest_daily.csv",
                     "--risk-summary-json",
                     "reports/v31_risk_aggregate_default_prod/summary.json",
-                    "--allocation-table",
-                    "v31_daily_allocation",
+                    "--allocation-csv",
+                    "reports/v31_risk_aggregate_default_prod/daily_allocation.csv",
                     "--start-date",
                     start,
                     "--end-date",
                     end,
                     "--reference-summary-json",
                     "artifacts/baselines/v31_backtest_eval_hardgate_gatepass/summary.json",
+                    "--reference-summary-sqlite-key",
+                    "v31_backtest_eval_hardgate_gatepass/summary.json",
+                    "--artifact-db-path",
+                    artifact_db_path,
                     "--lowfreq-summary-json",
                     "reports/v31_lowfreq_recovery_weekly/summary.json",
                     "--v2-latest-state-json",
@@ -516,3 +544,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

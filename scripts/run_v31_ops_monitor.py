@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import sqlite3
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote_plus
@@ -40,6 +41,33 @@ def _load_json_optional(path_str: str) -> dict:
     if not p.exists():
         return {}
     txt = p.read_text(encoding="utf-8-sig")
+    return json.loads(txt)
+
+
+def _load_json_from_sqlite(
+    db_path: str,
+    file_key: str,
+    table_name: str = "v30_artifact_file_store",
+) -> dict:
+    if not str(db_path).strip():
+        raise ValueError("sqlite db path is empty")
+    if not str(file_key).strip():
+        raise ValueError("sqlite file key is empty")
+    conn = sqlite3.connect(str(db_path))
+    try:
+        row = conn.execute(
+            f"SELECT content_text, content_blob FROM {table_name} WHERE file_path = ?",
+            (str(file_key).strip(),),
+        ).fetchone()
+    finally:
+        conn.close()
+    if row is None:
+        raise FileNotFoundError(f"sqlite file key not found: {file_key}")
+    txt = row[0]
+    if txt is None and row[1] is not None:
+        txt = bytes(row[1]).decode("utf-8", errors="replace")
+    if txt is None:
+        raise ValueError(f"empty json content in sqlite for key: {file_key}")
     return json.loads(txt)
 
 
@@ -686,6 +714,9 @@ def main() -> None:
     p.add_argument("--start-date", default="")
     p.add_argument("--end-date", default="")
     p.add_argument("--reference-summary-json", default="output/v31_backtest_eval_hardgate_gatepass/summary.json")
+    p.add_argument("--reference-summary-sqlite-key", default="")
+    p.add_argument("--artifact-db-path", default="data/backtest/v30_backtest.sqlite")
+    p.add_argument("--artifact-file-store-table", default="v30_artifact_file_store")
     p.add_argument("--lowfreq-summary-json", default="")
     p.add_argument("--v2-latest-state-json", default="")
     p.add_argument("--unified-sentiment-json", default="")
@@ -723,7 +754,14 @@ def main() -> None:
 
     bt = _load_json(Path(args.backtest_summary_json))
     rk = _load_json(Path(args.risk_summary_json))
-    rf = _load_json(Path(args.reference_summary_json))
+    if str(args.reference_summary_sqlite_key).strip():
+        rf = _load_json_from_sqlite(
+            db_path=str(args.artifact_db_path),
+            file_key=str(args.reference_summary_sqlite_key),
+            table_name=str(args.artifact_file_store_table),
+        )
+    else:
+        rf = _load_json(Path(args.reference_summary_json))
     lf = _load_json_optional(args.lowfreq_summary_json)
     v2 = _load_json_optional(args.v2_latest_state_json)
     us = _load_json_optional(args.unified_sentiment_json)
@@ -1256,9 +1294,9 @@ def main() -> None:
 
     risk_summary_path = Path(str(args.risk_summary_json))
     backtest_summary_path = Path(str(args.backtest_summary_json))
-    lowfreq_summary_path = Path(str(args.lowfreq_summary_json)) if str(args.lowfreq_summary_json).strip() else Path("")
+    lowfreq_summary_path = Path(str(args.lowfreq_summary_json)) if str(args.lowfreq_summary_json).strip() else None
     us_latest_path = Path(str(args.unified_sentiment_json)) if str(args.unified_sentiment_json).strip() else Path("")
-    us_summary_path = Path(str(args.unified_sentiment_summary_json)) if str(args.unified_sentiment_summary_json).strip() else Path("")
+    us_summary_path = Path(str(args.unified_sentiment_summary_json)) if str(args.unified_sentiment_summary_json).strip() else None
     risk_dir = risk_summary_path.parent if str(args.risk_summary_json).strip() else Path("")
 
     required_artifacts: list[tuple[str, Path, str]] = [
@@ -1271,9 +1309,9 @@ def main() -> None:
     ]
     if str(us_latest_path):
         required_artifacts.append(("v31_unified_sentiment_latest", us_latest_path, "sentiment_daily_unified"))
-    if str(us_summary_path):
+    if us_summary_path is not None:
         required_artifacts.append(("v31_unified_sentiment_summary", us_summary_path, "sentiment_daily_unified"))
-    if str(lowfreq_summary_path):
+    if lowfreq_summary_path is not None:
         required_artifacts.append(("v31_lowfreq_summary", lowfreq_summary_path, "v31_lowfreq_recovery_summary"))
     if not skip_report_files:
         required_artifacts.insert(1, ("ops_report_md", named_daily_report, str(args.report_archive_table)))
@@ -1401,3 +1439,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -1,12 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
-import os
 from pathlib import Path
 import sys
 
 import pandas as pd
-import pymysql
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -14,58 +12,19 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from v30.shock_engine.labeling import add_shock_label_proxy
 from v30.structural_engine.labeling import add_structural_label
+from v30.data_layer import connect_backtest_db, read_table, upsert_dataframe
 
 
-def _db_connect():
-    host = os.getenv("MYSQL_HOST", os.getenv("DB_HOST", "localhost"))
-    port = int(os.getenv("MYSQL_PORT", os.getenv("DB_PORT", "3306")))
-    user = os.getenv("MYSQL_USER", os.getenv("DB_USER", "us_opr"))
-    password = os.getenv("MYSQL_PASSWORD", os.getenv("DB_PASSWORD", "sec@Bobo123"))
-    database = os.getenv("MYSQL_DATABASE", os.getenv("DB_NAME", "us_market"))
-    charset = os.getenv("MYSQL_CHARSET", "utf8mb4")
-    return pymysql.connect(
-        host=host,
-        port=port,
-        user=user,
-        password=password,
-        database=database,
-        charset=charset,
-    )
-
-
-def _upsert(df: pd.DataFrame, table_name: str, int_cols: set[str]) -> int:
+def _upsert(conn, df: pd.DataFrame, table_name: str, int_cols: set[str]) -> int:
     if df.empty:
         return 0
-    x = df.copy()
-    x["date"] = pd.to_datetime(x["date"]).dt.date
-    cols = [c for c in x.columns if c != "date"]
-    col_defs = ["`date` DATE NOT NULL PRIMARY KEY"]
-    for c in cols:
-        col_defs.append(f"`{c}` INT NULL" if c in int_cols else f"`{c}` DOUBLE NULL")
-    col_list = ", ".join(["`date`"] + [f"`{c}`" for c in cols])
-    placeholders = ", ".join(["%s"] * (len(cols) + 1))
-    updates = ", ".join([f"`{c}`=VALUES(`{c}`)" for c in cols])
-
-    with _db_connect() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"CREATE TABLE IF NOT EXISTS `{table_name}` ({', '.join(col_defs)})")
-            cur.execute(f"SHOW COLUMNS FROM `{table_name}`")
-            existing = {str(r[0]) for r in cur.fetchall()}
-            for c in cols:
-                if c in existing:
-                    continue
-                if c in int_cols:
-                    cur.execute(f"ALTER TABLE `{table_name}` ADD COLUMN `{c}` INT NULL")
-                else:
-                    cur.execute(f"ALTER TABLE `{table_name}` ADD COLUMN `{c}` DOUBLE NULL")
-            sql = (
-                f"INSERT INTO `{table_name}` ({col_list}) VALUES ({placeholders}) "
-                f"ON DUPLICATE KEY UPDATE {updates}"
-            )
-            rows = x[["date"] + cols].astype(object).where(pd.notna(x[["date"] + cols]), None).to_numpy().tolist()
-            cur.executemany(sql, rows)
-            conn.commit()
-            return len(rows)
+    return upsert_dataframe(
+        conn,
+        df,
+        table_name=table_name,
+        key_cols=("date",),
+        int_cols=int_cols,
+    )
 
 
 def main() -> None:
@@ -74,6 +33,7 @@ def main() -> None:
     p.add_argument("--features-table", default="")
     p.add_argument("--struct-table", default="v30_structural_labels_daily")
     p.add_argument("--shock-table", default="v30_shock_labels_daily")
+    p.add_argument("--db-path", default="data/backtest/v30_backtest.sqlite")
     p.add_argument("--skip-db-upsert", action="store_true")
     p.add_argument("--skip-csv-output", action="store_true")
     p.add_argument("--output-dir", default="output/v30_labels")
@@ -97,8 +57,8 @@ def main() -> None:
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     if str(args.features_table).strip():
-        with _db_connect() as conn:
-            df = pd.read_sql(f"SELECT * FROM `{str(args.features_table).strip()}` ORDER BY `date`", conn)
+        with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+            df = read_table(conn, str(args.features_table).strip())
         if df.empty:
             raise ValueError(f"no rows in features table: {args.features_table}")
         df["date"] = pd.to_datetime(df["date"])
@@ -144,12 +104,14 @@ def main() -> None:
     s_rows = 0
     k_rows = 0
     if not bool(args.skip_db_upsert):
-        s_rows = _upsert(struct_out, table_name=str(args.struct_table), int_cols={"label_structural"})
-        k_rows = _upsert(
-            shock_out,
-            table_name=str(args.shock_table),
-            int_cols={"label_shock"},
-        )
+        with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+            s_rows = _upsert(conn, struct_out, table_name=str(args.struct_table), int_cols={"label_structural"})
+            k_rows = _upsert(
+                conn,
+                shock_out,
+                table_name=str(args.shock_table),
+                int_cols={"label_shock"},
+            )
 
     if not bool(args.skip_csv_output):
         print(f"[OK] Wrote: {out_dir / 'structural_labels.csv'}")
@@ -161,3 +123,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -1,14 +1,12 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
-import os
 from pathlib import Path
 import sys
 
 import joblib
 import pandas as pd
-import pymysql
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -22,22 +20,12 @@ from v30.structural_engine.model import (
     train_structural_model,
 )
 from v30.structural_engine.evaluate import compute_metrics
+from v30.data_layer import connect_backtest_db, read_table, upsert_model_bundle
 
 
-def _connect():
-    return pymysql.connect(
-        host=os.getenv("MYSQL_HOST", os.getenv("DB_HOST", "localhost")),
-        port=int(os.getenv("MYSQL_PORT", os.getenv("DB_PORT", "3306"))),
-        user=os.getenv("MYSQL_USER", os.getenv("DB_USER", "us_opr")),
-        password=os.getenv("MYSQL_PASSWORD", os.getenv("DB_PASSWORD", "sec@Bobo123")),
-        database=os.getenv("MYSQL_DATABASE", os.getenv("DB_NAME", "us_market")),
-        charset=os.getenv("MYSQL_CHARSET", "utf8mb4"),
-    )
-
-
-def _load_features_table(table_name: str) -> pd.DataFrame:
-    with _connect() as conn:
-        df = pd.read_sql(f"SELECT * FROM `{table_name}` ORDER BY `date`", conn)
+def _load_features_table(table_name: str, db_path: str = "") -> pd.DataFrame:
+    with connect_backtest_db(str(db_path).strip() or None) as conn:
+        df = read_table(conn, table_name)
     if df.empty:
         raise ValueError(f"no rows in features table: {table_name}")
     df["date"] = pd.to_datetime(df["date"])
@@ -48,7 +36,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='V30 structural model train (Phase B bootstrap).')
     parser.add_argument('--features-csv', default='output/v30_features_daily.csv')
     parser.add_argument('--features-table', default='')
+    parser.add_argument('--db-path', default='data/backtest/v30_backtest.sqlite')
     parser.add_argument('--output-dir', default='output/v30_structural_train')
+    parser.add_argument('--artifact-db-path', default='data/backtest/v30_backtest.sqlite')
+    parser.add_argument('--model-key', default='v30_structural_model')
+    parser.add_argument('--skip-file-output', action='store_true')
     parser.add_argument('--calibration', choices=['none', 'sigmoid', 'isotonic'], default='sigmoid')
     parser.add_argument('--test-years', type=int, default=2)
     parser.add_argument('--label-horizon-days', type=int, default=30)
@@ -61,7 +53,7 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if str(args.features_table).strip():
-        df = _load_features_table(str(args.features_table).strip())
+        df = _load_features_table(str(args.features_table).strip(), db_path=str(args.db_path))
     else:
         if not in_csv.exists():
             raise FileNotFoundError(f'features csv not found: {in_csv}')
@@ -94,7 +86,8 @@ def main() -> None:
     pred = test_df[['date', 'label_structural']].copy()
     pred['p_structural'] = p_test
     pred = pred.sort_values('date', ascending=False).reset_index(drop=True)
-    pred.to_csv(out_dir / 'structural_test_predictions.csv', index=False)
+    if not bool(args.skip_file_output):
+        pred.to_csv(out_dir / 'structural_test_predictions.csv', index=False)
 
     summary = {
         'rows_total': int(len(labeled)),
@@ -112,14 +105,25 @@ def main() -> None:
         'feature_columns': feat_cols,
         'split_date': str(pd.Timestamp(split_date).date()),
     }
-    (out_dir / 'summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
+    bundle = {'model': model, 'feature_columns': feat_cols, 'summary': summary}
+    if not bool(args.skip_file_output):
+        (out_dir / 'summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
+        joblib.dump(bundle, out_dir / 'structural_model.pkl')
+        print(f"[OK] Wrote: {out_dir / 'structural_test_predictions.csv'}")
+        print(f"[OK] Wrote: {out_dir / 'summary.json'}")
+        print(f"[OK] Wrote: {out_dir / 'structural_model.pkl'}")
 
-    joblib.dump({'model': model, 'feature_columns': feat_cols, 'summary': summary}, out_dir / 'structural_model.pkl')
-
-    print(f"[OK] Wrote: {out_dir / 'structural_test_predictions.csv'}")
-    print(f"[OK] Wrote: {out_dir / 'summary.json'}")
-    print(f"[OK] Wrote: {out_dir / 'structural_model.pkl'}")
+    if str(args.artifact_db_path).strip():
+        with connect_backtest_db(str(args.artifact_db_path).strip()) as conn:
+            upsert_model_bundle(
+                conn,
+                model_key=str(args.model_key).strip() or "v30_structural_model",
+                bundle=bundle,
+                metadata={"type": "structural", "split_date": summary.get("split_date", "")},
+            )
+        print(f"[OK] SQLite model upsert: key={str(args.model_key).strip() or 'v30_structural_model'}")
 
 
 if __name__ == '__main__':
     main()
+

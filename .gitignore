@@ -48,3 +48,4 @@ temp/
 Thumbs.db
 *.bat
 reports/report_20260302.md
+/data/backtest/*.sqlite

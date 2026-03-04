@@ -2,12 +2,10 @@
 
 import argparse
 import json
-import os
 from pathlib import Path
 import sys
 
 import pandas as pd
-import pymysql
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -15,76 +13,26 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from v30.allocation.decision import AllocationConfig, apply_allocation
 from v30.risk_aggregation.aggregate import AggregationConfig, aggregate_risk
+from v30.data_layer import connect_backtest_db, read_table, upsert_dataframe
 
-
-def _connect():
-    return pymysql.connect(
-        host=os.getenv("MYSQL_HOST", os.getenv("DB_HOST", "localhost")),
-        port=int(os.getenv("MYSQL_PORT", os.getenv("DB_PORT", "3306"))),
-        user=os.getenv("MYSQL_USER", os.getenv("DB_USER", "us_opr")),
-        password=os.getenv("MYSQL_PASSWORD", os.getenv("DB_PASSWORD", "sec@Bobo123")),
-        database=os.getenv("MYSQL_DATABASE", os.getenv("DB_NAME", "us_market")),
-        charset=os.getenv("MYSQL_CHARSET", "utf8mb4"),
-    )
-
-
-def _read_table(table_name: str, cols: list[str] | None = None, start: str = "", end: str = "") -> pd.DataFrame:
-    pick = "*" if not cols else ", ".join([f"`{c}`" for c in cols])
-    cond = ""
-    params: tuple[str, ...] = ()
-    if str(start).strip() and str(end).strip():
-        cond = " WHERE `date` BETWEEN %s AND %s"
-        params = (str(start), str(end))
-    sql = f"SELECT {pick} FROM `{table_name}`{cond} ORDER BY `date`"
-    with _connect() as conn:
-        df = pd.read_sql(sql, conn, params=params)
+def _read_table(conn, table_name: str, cols: list[str] | None = None, start: str = "", end: str = "") -> pd.DataFrame:
+    df = read_table(conn, table_name=table_name, cols=cols, start=start, end=end)
     if df.empty:
         raise ValueError(f"no rows in table: {table_name}")
     df["date"] = pd.to_datetime(df["date"]).dt.normalize()
     return df
 
 
-def _upsert_df(df: pd.DataFrame, table_name: str, int_cols: set[str] | None = None) -> int:
+def _upsert_df(conn, df: pd.DataFrame, table_name: str, int_cols: set[str] | None = None) -> int:
     if df.empty:
         return 0
-    int_cols = int_cols or set()
-    x = df.copy()
-    x["date"] = pd.to_datetime(x["date"]).dt.date
-    cols = [c for c in x.columns if c != "date"]
-    defs = ["`date` DATE NOT NULL PRIMARY KEY"]
-    text_cols: set[str] = set()
-    for c in cols:
-        if c in int_cols:
-            defs.append(f"`{c}` INT NULL")
-            continue
-        s = x[c]
-        if pd.api.types.is_numeric_dtype(s):
-            defs.append(f"`{c}` DOUBLE NULL")
-        else:
-            defs.append(f"`{c}` VARCHAR(64) NULL")
-            text_cols.add(c)
-    col_list = ", ".join(["`date`"] + [f"`{c}`" for c in cols])
-    placeholders = ", ".join(["%s"] * (len(cols) + 1))
-    updates = ", ".join([f"`{c}`=VALUES(`{c}`)" for c in cols])
-    with _connect() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"CREATE TABLE IF NOT EXISTS `{table_name}` ({', '.join(defs)})")
-            cur.execute(f"SHOW COLUMNS FROM `{table_name}`")
-            existing = {str(r[0]) for r in cur.fetchall()}
-            for c in cols:
-                if c in existing:
-                    continue
-                if c in int_cols:
-                    cur.execute(f"ALTER TABLE `{table_name}` ADD COLUMN `{c}` INT NULL")
-                elif c in text_cols:
-                    cur.execute(f"ALTER TABLE `{table_name}` ADD COLUMN `{c}` VARCHAR(64) NULL")
-                else:
-                    cur.execute(f"ALTER TABLE `{table_name}` ADD COLUMN `{c}` DOUBLE NULL")
-            sql = f"INSERT INTO `{table_name}` ({col_list}) VALUES ({placeholders}) ON DUPLICATE KEY UPDATE {updates}"
-            rows = x[["date"] + cols].astype(object).where(pd.notna(x[["date"] + cols]), None).to_numpy().tolist()
-            cur.executemany(sql, rows)
-            conn.commit()
-            return len(rows)
+    return upsert_dataframe(
+        conn,
+        df,
+        table_name=table_name,
+        key_cols=("date",),
+        int_cols=int_cols or set(),
+    )
 
 
 def _maybe_load_tuning(path: str | None) -> dict:
@@ -273,6 +221,7 @@ def main() -> None:
     parser.add_argument('--struct-pred-table', default='')
     parser.add_argument('--shock-pred-csv', default='output/v30_shock_train/shock_test_predictions.csv')
     parser.add_argument('--shock-pred-table', default='')
+    parser.add_argument('--db-path', default='data/backtest/v30_backtest.sqlite')
     parser.add_argument('--output-dir', default='output/v30_risk_aggregate')
     parser.add_argument('--output-table', default='v31_daily_allocation')
     parser.add_argument('--skip-db-upsert', action='store_true')
@@ -295,34 +244,37 @@ def main() -> None:
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    if str(args.features_table).strip():
-        feat = _read_table(str(args.features_table).strip(), start=str(args.data_start), end=str(args.data_end))
-    else:
-        if not f_csv.exists():
-            raise FileNotFoundError(f'missing input: {f_csv}')
-        feat = pd.read_csv(f_csv, parse_dates=['date'])
-    if str(args.struct_pred_table).strip():
-        st = _read_table(
-            str(args.struct_pred_table).strip(),
-            cols=["date", "p_structural"],
-            start=str(args.data_start),
-            end=str(args.data_end),
-        )[["date", "p_structural"]]
-    else:
-        if not s_csv.exists():
-            raise FileNotFoundError(f'missing input: {s_csv}')
-        st = pd.read_csv(s_csv, parse_dates=['date'])[['date', 'p_structural']]
-    if str(args.shock_pred_table).strip():
-        sh = _read_table(
-            str(args.shock_pred_table).strip(),
-            cols=["date", "p_shock"],
-            start=str(args.data_start),
-            end=str(args.data_end),
-        )[["date", "p_shock"]]
-    else:
-        if not k_csv.exists():
-            raise FileNotFoundError(f'missing input: {k_csv}')
-        sh = pd.read_csv(k_csv, parse_dates=['date'])[['date', 'p_shock']]
+    with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+        if str(args.features_table).strip():
+            feat = _read_table(conn, str(args.features_table).strip(), start=str(args.data_start), end=str(args.data_end))
+        else:
+            if not f_csv.exists():
+                raise FileNotFoundError(f'missing input: {f_csv}')
+            feat = pd.read_csv(f_csv, parse_dates=['date'])
+        if str(args.struct_pred_table).strip():
+            st = _read_table(
+                conn,
+                str(args.struct_pred_table).strip(),
+                cols=["date", "p_structural"],
+                start=str(args.data_start),
+                end=str(args.data_end),
+            )[["date", "p_structural"]]
+        else:
+            if not s_csv.exists():
+                raise FileNotFoundError(f'missing input: {s_csv}')
+            st = pd.read_csv(s_csv, parse_dates=['date'])[['date', 'p_structural']]
+        if str(args.shock_pred_table).strip():
+            sh = _read_table(
+                conn,
+                str(args.shock_pred_table).strip(),
+                cols=["date", "p_shock"],
+                start=str(args.data_start),
+                end=str(args.data_end),
+            )[["date", "p_shock"]]
+        else:
+            if not k_csv.exists():
+                raise FileNotFoundError(f'missing input: {k_csv}')
+            sh = pd.read_csv(k_csv, parse_dates=['date'])[['date', 'p_shock']]
 
     feat['date'] = pd.to_datetime(feat['date']).dt.normalize()
     st['date'] = pd.to_datetime(st['date']).dt.normalize()
@@ -406,7 +358,8 @@ def main() -> None:
         out.to_csv(out_dir / 'daily_allocation.csv', index=False)
     if not bool(args.skip_db_upsert):
         int_cols = {"early_struct_level", "tactical_level", "tactical_gate_on", "hard_force_crisis", "hard_trend_cap_flag", "hard_credit_high_flag", "recovery_active", "recovery_days", "guardrail_applied"}
-        rows = _upsert_df(out, table_name=str(args.output_table), int_cols=int_cols)
+        with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+            rows = _upsert_df(conn, out, table_name=str(args.output_table), int_cols=int_cols)
         print(f"[OK] DB upsert rows: {rows} -> table `{args.output_table}`")
 
     latest = out.iloc[0].to_dict()
@@ -533,3 +486,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

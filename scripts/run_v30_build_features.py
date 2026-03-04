@@ -20,35 +20,31 @@ from v30.feature_engineering.build_features import (
     load_market_data,
     write_metadata,
 )
+from v30.data_layer import connect_backtest_db, read_table, upsert_dataframe
 
 
-def _load_market_data_from_db(table_name: str, start: str = "", end: str = "") -> pd.DataFrame:
-    host = os.getenv("MYSQL_HOST", os.getenv("DB_HOST", "localhost"))
-    port = int(os.getenv("MYSQL_PORT", os.getenv("DB_PORT", "3306")))
-    user = os.getenv("MYSQL_USER", os.getenv("DB_USER", "us_opr"))
-    password = os.getenv("MYSQL_PASSWORD", os.getenv("DB_PASSWORD", "sec@Bobo123"))
-    database = os.getenv("MYSQL_DATABASE", os.getenv("DB_NAME", "us_market"))
-    charset = os.getenv("MYSQL_CHARSET", "utf8mb4")
-
-    cond = ""
-    params: list[str] = []
-    if str(start).strip() and str(end).strip():
-        cond = " WHERE `date` BETWEEN %s AND %s"
-        params = [str(start), str(end)]
-    sql = (
-        f"SELECT `date`, `vol20`, `vol60`, `hurst_100`, `drawdown_252`, `drawdown_126`, `ret5d`, `ret20d`, "
-        f"`ibb_ret20d`, `ibb_drawdown_126`, `ibb_rel20d`, `external_event`, `is_trading_day` "
-        f"FROM `{table_name}`{cond} ORDER BY `date`"
+def _load_market_data_from_db(conn, table_name: str, start: str = "", end: str = "") -> pd.DataFrame:
+    df = read_table(
+        conn,
+        table_name=table_name,
+        cols=[
+            "date",
+            "vol20",
+            "vol60",
+            "hurst_100",
+            "drawdown_252",
+            "drawdown_126",
+            "ret5d",
+            "ret20d",
+            "ibb_ret20d",
+            "ibb_drawdown_126",
+            "ibb_rel20d",
+            "external_event",
+            "is_trading_day",
+        ],
+        start=start,
+        end=end,
     )
-    with pymysql.connect(
-        host=host,
-        port=port,
-        user=user,
-        password=password,
-        database=database,
-        charset=charset,
-    ) as conn:
-        df = pd.read_sql(sql, conn, params=tuple(params))
     if df.empty:
         raise ValueError(f"No rows loaded from table `{table_name}`.")
     df["date"] = pd.to_datetime(df["date"]).dt.normalize()
@@ -75,13 +71,7 @@ def _load_market_data_from_db(table_name: str, start: str = "", end: str = "") -
     return df.sort_values("date").reset_index(drop=True)
 
 
-def _upsert_features_to_db(df: pd.DataFrame, table_name: str) -> int:
-    if df.empty:
-        return 0
-    x = df.copy()
-    x["date"] = pd.to_datetime(x["date"]).dt.date
-    cols = [c for c in x.columns if c != "date"]
-
+def _load_market_data_from_mysql(table_name: str, start: str = "", end: str = "") -> pd.DataFrame:
     host = os.getenv("MYSQL_HOST", os.getenv("DB_HOST", "localhost"))
     port = int(os.getenv("MYSQL_PORT", os.getenv("DB_PORT", "3306")))
     user = os.getenv("MYSQL_USER", os.getenv("DB_USER", "us_opr"))
@@ -89,12 +79,16 @@ def _upsert_features_to_db(df: pd.DataFrame, table_name: str) -> int:
     database = os.getenv("MYSQL_DATABASE", os.getenv("DB_NAME", "us_market"))
     charset = os.getenv("MYSQL_CHARSET", "utf8mb4")
 
-    col_defs = ["`date` DATE NOT NULL PRIMARY KEY"]
-    col_defs.extend([f"`{c}` DOUBLE NULL" for c in cols])
-    col_list = ", ".join(["`date`"] + [f"`{c}`" for c in cols])
-    placeholders = ", ".join(["%s"] * (len(cols) + 1))
-    updates = ", ".join([f"`{c}`=VALUES(`{c}`)" for c in cols])
-
+    cond = ""
+    params: list[str] = []
+    if str(start).strip() and str(end).strip():
+        cond = " WHERE `date` BETWEEN %s AND %s"
+        params = [str(start), str(end)]
+    sql = (
+        f"SELECT `date`, `vol20`, `vol60`, `hurst_100`, `drawdown_252`, `drawdown_126`, `ret5d`, `ret20d`, "
+        f"`ibb_ret20d`, `ibb_drawdown_126`, `ibb_rel20d`, `external_event`, `is_trading_day` "
+        f"FROM `{table_name}`{cond} ORDER BY `date`"
+    )
     with pymysql.connect(
         host=host,
         port=port,
@@ -102,22 +96,37 @@ def _upsert_features_to_db(df: pd.DataFrame, table_name: str) -> int:
         password=password,
         database=database,
         charset=charset,
-    ) as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"CREATE TABLE IF NOT EXISTS `{table_name}` ({', '.join(col_defs)})")
-            cur.execute(f"SHOW COLUMNS FROM `{table_name}`")
-            existing_cols = {str(r[0]) for r in cur.fetchall()}
-            for c in cols:
-                if c not in existing_cols:
-                    cur.execute(f"ALTER TABLE `{table_name}` ADD COLUMN `{c}` DOUBLE NULL")
-            sql = (
-                f"INSERT INTO `{table_name}` ({col_list}) VALUES ({placeholders}) "
-                f"ON DUPLICATE KEY UPDATE {updates}"
-            )
-            rows = x[["date"] + cols].astype(object).where(pd.notna(x[["date"] + cols]), None).to_numpy().tolist()
-            cur.executemany(sql, rows)
-            conn.commit()
-            return len(rows)
+    ) as mysql_conn:
+        df = pd.read_sql(sql, mysql_conn, params=tuple(params))
+    if df.empty:
+        raise ValueError(f"No rows loaded from mysql table `{table_name}`.")
+    df["date"] = pd.to_datetime(df["date"]).dt.normalize()
+    if "is_trading_day" in df.columns:
+        df_trading = df[df["is_trading_day"].fillna(1).astype(int) == 1].copy()
+        if not df_trading.empty:
+            df = df_trading
+    for c in [
+        "vol20",
+        "vol60",
+        "hurst_100",
+        "drawdown_252",
+        "drawdown_126",
+        "ret5d",
+        "ret20d",
+        "ibb_ret20d",
+        "ibb_drawdown_126",
+        "ibb_rel20d",
+        "external_event",
+    ]:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+    return df.sort_values("date").reset_index(drop=True)
+
+
+def _upsert_features_to_db(conn, df: pd.DataFrame, table_name: str) -> int:
+    if df.empty:
+        return 0
+    return upsert_dataframe(conn, df, table_name=table_name, key_cols=("date",))
 
 
 def main() -> None:
@@ -132,11 +141,13 @@ def main() -> None:
         default="",
         help="Input market feature DB table. If set, takes precedence over --input-csv.",
     )
+    parser.add_argument("--input-table-source", choices=["sqlite", "mysql"], default="sqlite")
     parser.add_argument("--input-start", default="")
     parser.add_argument("--input-end", default="")
     parser.add_argument("--output-csv", default="output/v30_features_daily.csv")
     parser.add_argument("--meta-json", default="output/v30_features_build_meta.json")
     parser.add_argument("--table-name", default="v30_features_daily")
+    parser.add_argument("--db-path", default="data/backtest/v30_backtest.sqlite")
     parser.add_argument("--skip-db-upsert", action="store_true")
     parser.add_argument("--skip-csv-output", action="store_true")
     parser.add_argument(
@@ -161,11 +172,20 @@ def main() -> None:
     meta_json.parent.mkdir(parents=True, exist_ok=True)
 
     if str(args.input_table).strip():
-        raw = _load_market_data_from_db(
-            table_name=str(args.input_table).strip(),
-            start=str(args.input_start).strip(),
-            end=str(args.input_end).strip(),
-        )
+        if str(args.input_table_source).strip().lower() == "mysql":
+            raw = _load_market_data_from_mysql(
+                table_name=str(args.input_table).strip(),
+                start=str(args.input_start).strip(),
+                end=str(args.input_end).strip(),
+            )
+        else:
+            with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+                raw = _load_market_data_from_db(
+                    conn=conn,
+                    table_name=str(args.input_table).strip(),
+                    start=str(args.input_start).strip(),
+                    end=str(args.input_end).strip(),
+                )
     else:
         if input_csv is None or not input_csv.exists():
             raise FileNotFoundError(f"Input csv not found: {input_csv}")
@@ -190,7 +210,8 @@ def main() -> None:
         feat.to_csv(output_csv, index=False)
     upsert_rows = 0
     if not bool(args.skip_db_upsert):
-        upsert_rows = _upsert_features_to_db(feat, table_name=str(args.table_name))
+        with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+            upsert_rows = _upsert_features_to_db(conn, feat, table_name=str(args.table_name))
     breadth_cov = float(pd.to_numeric(feat.get("breadth_real_stress"), errors="coerce").notna().mean()) if "breadth_real_stress" in feat.columns else 0.0
     write_metadata(
         meta_json,
@@ -221,4 +242,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 

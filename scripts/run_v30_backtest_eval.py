@@ -2,70 +2,31 @@
 
 import argparse
 import json
-import os
 from pathlib import Path
 import sys
 
 import pandas as pd
-import pymysql
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from v30.backtest.portfolio_eval import summarize
+from v30.data_layer import connect_backtest_db, read_table, upsert_dataframe
 
 
-def _connect():
-    return pymysql.connect(
-        host=os.getenv("MYSQL_HOST", os.getenv("DB_HOST", "localhost")),
-        port=int(os.getenv("MYSQL_PORT", os.getenv("DB_PORT", "3306"))),
-        user=os.getenv("MYSQL_USER", os.getenv("DB_USER", "us_opr")),
-        password=os.getenv("MYSQL_PASSWORD", os.getenv("DB_PASSWORD", "sec@Bobo123")),
-        database=os.getenv("MYSQL_DATABASE", os.getenv("DB_NAME", "us_market")),
-        charset=os.getenv("MYSQL_CHARSET", "utf8mb4"),
-    )
-
-
-def _read_table(table_name: str, cols: list[str] | None = None, start: str = "", end: str = "") -> pd.DataFrame:
-    pick = "*" if not cols else ", ".join([f"`{c}`" for c in cols])
-    cond = ""
-    params: tuple[str, ...] = ()
-    if str(start).strip() and str(end).strip():
-        cond = " WHERE `date` BETWEEN %s AND %s"
-        params = (str(start), str(end))
-    sql = f"SELECT {pick} FROM `{table_name}`{cond} ORDER BY `date`"
-    with _connect() as conn:
-        df = pd.read_sql(sql, conn, params=params)
+def _read_table(conn, table_name: str, cols: list[str] | None = None, start: str = "", end: str = "") -> pd.DataFrame:
+    df = read_table(conn, table_name=table_name, cols=cols, start=start, end=end)
     if df.empty:
         raise ValueError(f"no rows in table: {table_name}")
     df["date"] = pd.to_datetime(df["date"]).dt.normalize()
     return df
 
 
-def _upsert_df(df: pd.DataFrame, table_name: str) -> int:
+def _upsert_df(conn, df: pd.DataFrame, table_name: str) -> int:
     if df.empty:
         return 0
-    x = df.copy()
-    x["date"] = pd.to_datetime(x["date"]).dt.date
-    cols = [c for c in x.columns if c != "date"]
-    defs = ["`date` DATE NOT NULL PRIMARY KEY"] + [f"`{c}` DOUBLE NULL" for c in cols]
-    col_list = ", ".join(["`date`"] + [f"`{c}`" for c in cols])
-    placeholders = ", ".join(["%s"] * (len(cols) + 1))
-    updates = ", ".join([f"`{c}`=VALUES(`{c}`)" for c in cols])
-    with _connect() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"CREATE TABLE IF NOT EXISTS `{table_name}` ({', '.join(defs)})")
-            cur.execute(f"SHOW COLUMNS FROM `{table_name}`")
-            existing = {str(r[0]) for r in cur.fetchall()}
-            for c in cols:
-                if c not in existing:
-                    cur.execute(f"ALTER TABLE `{table_name}` ADD COLUMN `{c}` DOUBLE NULL")
-            sql = f"INSERT INTO `{table_name}` ({col_list}) VALUES ({placeholders}) ON DUPLICATE KEY UPDATE {updates}"
-            rows = x[["date"] + cols].astype(object).where(pd.notna(x[["date"] + cols]), None).to_numpy().tolist()
-            cur.executemany(sql, rows)
-            conn.commit()
-            return len(rows)
+    return upsert_dataframe(conn, df, table_name=table_name, key_cols=("date",))
 
 def fetch_spy_ret(start: pd.Timestamp, end: pd.Timestamp, spy_ret_csv: str) -> pd.Series:
     p = Path(spy_ret_csv)
@@ -98,6 +59,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='V30 Phase-E backtest evaluation from allocation output.')
     parser.add_argument('--allocation-csv', default='output/v30_risk_aggregate/daily_allocation.csv')
     parser.add_argument('--allocation-table', default='')
+    parser.add_argument('--db-path', default='data/backtest/v30_backtest.sqlite')
     parser.add_argument('--output-dir', default='output/v30_backtest_eval')
     parser.add_argument('--output-daily-table', default='v30_backtest_daily')
     parser.add_argument('--skip-db-upsert', action='store_true')
@@ -114,11 +76,13 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if str(args.allocation_table).strip():
-        df = _read_table(
-            str(args.allocation_table).strip(),
-            start=str(args.data_start),
-            end=str(args.data_end),
-        )
+        with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+            df = _read_table(
+                conn,
+                str(args.allocation_table).strip(),
+                start=str(args.data_start),
+                end=str(args.data_end),
+            )
     else:
         if not alloc_csv.exists():
             raise FileNotFoundError(f'missing allocation csv: {alloc_csv}')
@@ -183,7 +147,8 @@ def main() -> None:
     if not bool(args.skip_csv_output):
         daily.to_csv(out_dir / 'v30_backtest_daily.csv', index=False)
     if not bool(args.skip_db_upsert):
-        rows = _upsert_df(daily, table_name=str(args.output_daily_table))
+        with connect_backtest_db(str(args.db_path).strip() or None) as conn:
+            rows = _upsert_df(conn, daily, table_name=str(args.output_daily_table))
         print(f"[OK] DB upsert rows: {rows} -> table `{args.output_daily_table}`")
 
     if not bool(args.skip_csv_output):
@@ -230,3 +195,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+
