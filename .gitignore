@@ -50,3 +50,4 @@ Thumbs.db
 reports/report_20260302.md
 /data/backtest/*.sqlite
 /data/backup/
+/artifacts/v31_train_assets/*
